@@ -98,7 +98,7 @@ public class AdapterTest {
         Cycle cycle = factory.createCycle(copyOfOverview);
 
         // look at the first endpoint
-        Endpoint endpoint = cycle.next();
+        Endpoint endpoint = cycle.next("http://www.endpoint1.org", "group1");
 
         // check the endpoint URI
         assertEquals("http://www.endpoint1.org", endpoint.getURI());
@@ -157,7 +157,7 @@ public class AdapterTest {
         cycle = factory.createCycle(copyOfOverview);
 
         // look at the first endpoint again
-        endpoint = cycle.next();
+        endpoint = cycle.next("http://www.endpoint1.org", "group1");
 
         // read back the new values, and check if they have indeed been changed
 

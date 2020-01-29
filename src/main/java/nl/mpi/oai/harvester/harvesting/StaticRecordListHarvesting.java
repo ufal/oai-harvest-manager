@@ -152,6 +152,10 @@ public final class StaticRecordListHarvesting extends AbstractListHarvesting
         try {
             node = (Node) provider.xpath.evaluate(expression,
                     document.getDocument(), XPathConstants.NODE);
+            if(node == null){
+                logger.warn("Failed to find node for " + expression);
+                return false;
+            }
         } catch (XPathExpressionException e) {
             // something went wrong, let the scenario try another provider
             logger.error(e.getMessage(), e);

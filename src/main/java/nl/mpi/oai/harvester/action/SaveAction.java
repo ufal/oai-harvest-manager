@@ -73,10 +73,6 @@ public class SaveAction implements Action {
         this.history = history;
     }
 
-    public Document getDocument(Metadata metadata) {
-        return metadata.getDoc();
-    }
-
     @Override
     public boolean perform(List<Metadata> records) {
 

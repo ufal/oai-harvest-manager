@@ -68,11 +68,8 @@ public class TestHelper {
             fail();
         }
 
-        String filename;
         // get the path without escape characters as needed by the CycleFactory
-        filename = uri.getPath();
-
-        return new File (uri.getPath());
+       return new File (uri.getPath());
     }
 
     /**

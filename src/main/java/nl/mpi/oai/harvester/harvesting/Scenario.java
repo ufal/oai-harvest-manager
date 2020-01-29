@@ -171,7 +171,8 @@ public class Scenario {
                     // apply the action sequence to the record
                     actionSequence.runActions(record);
                 }
-                
+
+                // FIXME record might be null at this point
                 record.close();
             } finally {
                 if (provider.isExclusive()) {

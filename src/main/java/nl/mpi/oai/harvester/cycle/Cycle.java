@@ -18,8 +18,6 @@
 
 package nl.mpi.oai.harvester.cycle;
 
-import org.joda.time.DateTime;
-
 /**
  * <br> The way to iterate over OAI endpoints <br><br>
  *
@@ -66,19 +64,6 @@ public interface Cycle {
     Endpoint next (String URI, String group);
 
     /**
-     * <br> Get the next residual endpoint in the cycle <br><br>
-     *
-     * Next to endpoints the client identifies, there might be endpoints in
-     * the overview that have, in the current cycle, for some reason, not been
-     * identified yet. When the client invokes the next method on the cycle
-     * object without a URI, the method will return one of these endpoints and
-     * remove it from the list of endpoints available for harvesting.
-     *
-     * @return an endpoint not visited in the current cycle
-     */
-    Endpoint next ();
-
-    /**
      * <br> Check if the endpoint should be harvested <br><br>
      *
      * When it decides whether or not the endpoint given should be harvested,
@@ -104,36 +89,5 @@ public interface Cycle {
      * @return true if and only if the endpoint should be harvested
      */
     boolean doHarvest (Endpoint endpoint);
-
-    /**
-     * <br> Check if the endpoint indicated by the URI should be harvested <br><br>
-     *
-     * For this method, the same applies as in the case of the doHarvest method
-     * with an EndpointType parameter.
-     *
-     * @param URI the endpoint considered
-     * @return true if and only if the endpoint should be harvested
-     */
-    boolean doHarvest (String URI);
-
-    /**
-     * <br> Get the date needed when issuing the OAI request <br><br>
-     *
-     * The date returned depends both on the mode of the cycle as well as on
-     * the properties of the endpoint.
-     *
-     * In normal mode, it will return the date for harvesting, provided the
-     * endpoint has not been blocked. In retry mode, it will return the date,
-     * only if the endpoint allows a retry. In refresh mode, the method will
-     * always return the epoch date.
-     *
-     * Note: before issuing an OAI request, the cycle should first find out if
-     * it should harvest the endpoint or not. After that, it can determine the
-     * date it should use for building the request.
-     * 
-     * @param endPoint the endpoint
-     * @return date needed for the OAI request
-     */
-    DateTime getRequestDate (Endpoint endPoint);
 
 }

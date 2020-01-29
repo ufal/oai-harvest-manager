@@ -20,8 +20,6 @@ package nl.mpi.oai.harvester;
 
 import ORG.oclc.oai.harvester2.verb.HarvesterVerb;
 import ORG.oclc.oai.harvester2.verb.Identify;
-import nl.mpi.oai.harvester.metadata.Metadata;
-import nl.mpi.oai.harvester.metadata.MetadataFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -36,9 +34,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * This class represents a static OAI-PMH provider as defined by the <a
@@ -143,38 +138,7 @@ public class StaticProvider extends Provider {
 	return parseProviderName(doc);
     }
 
-    @Override
-    public List<String> getPrefixes(MetadataFormat format) {
-	try {
-	    Document doc = getSubtree("/os:Repository/os:ListMetadataFormats");
-	    return parsePrefixes(providerContent, format);
-	} catch (XPathExpressionException e) {
-	    logger.error(e.getMessage(), e);
-	}
-	return Collections.emptyList();
-    }
-
-    @Override
-    public List<String> getIdentifiers(String mdPrefix) throws IOException,
-	    ParserConfigurationException, SAXException, TransformerException,
-	    XPathExpressionException, NoSuchFieldException {
-	Document doc = getSubtree("/os:Repository/os:ListRecords[@metadataPrefix = '"+mdPrefix+"']");
-	List<String> ids = new ArrayList<>();
-	addIdentifiers(doc, ids);
-	return ids;
-    }
-
-    @Override
-    public Metadata getRecord(String id, String mdPrefix) {
-	String xp = "/os:Repository/os:ListRecords[@metadataPrefix = '"
-		+ mdPrefix + "']/oai:record[./oai:header/oai:identifier/text() = '"
-		+ id + "']";
-	Document doc = getSubtree(xp);
-	if (doc == null) return null;
-	return new Metadata(id, mdPrefix, doc, this, true, false);
-    }
-
-    /**
+	/**
      * Fetch the content of the static provider and put it in providerContent.
      */
     private void fetchContent() {

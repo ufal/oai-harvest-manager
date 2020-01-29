@@ -145,24 +145,6 @@ public interface Endpoint {
     boolean retry();
 
     /**
-     * <br> Check if the cycle should refresh the endpoint <br><br>
-     *
-     * Refreshing the endpoint means that the cycle will create a request to
-     * harvest all the records the endpoint provides. A request like this is
-     * required, for example, when due to an error, the set of records can no
-     * longer be considered complete.
-     *
-     * Note: the cycle will only refresh the endpoints records if it is in
-     * refresh mode.
-     *
-     * Note: like in the case of the possibility of incremental harvest, the
-     * cycle does set the property by itself.
-     *
-     * @return true if a refresh is allowed, false otherwise
-     */
-    boolean allowRefresh ();
-
-    /**
      * <br> Return the date of the most recent harvest attempt <br><br>
      *
      * By remembering the date on which the cycle most recently attempted to

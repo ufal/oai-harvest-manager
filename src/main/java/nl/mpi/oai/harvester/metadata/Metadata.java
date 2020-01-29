@@ -194,15 +194,7 @@ public class Metadata {
 	return docSrc.getStream();
     }
 
-    /** 
-     * Is there a XML stream representing this record?
-     * @return the answer to this question
-     */
-    public boolean hasSource() {
-	return docSrc.hasSource();
-    }
-
-    /** 
+    /**
      * Get the XML stream representing this record. 
      * @return the XML stream
      */
@@ -218,42 +210,6 @@ public class Metadata {
         return origin;
     }
 
-    /**
-     * Check if the document is an an envelope
-     *
-     * @return true, iff the document is an envelope
-     */
-    public boolean isEnvelope(){
-        return isEnvelope;
-    }
-
-    /**
-     * Check if the metadata takes the form of a list
-     *
-     * @return true, iff the metadata takes the form of a list
-     */
-    public boolean isList () {
-        return isList;
-    }
-
-    /**
-     * Remember whether or not the metadata is packaged in an envelope
-     *
-     * @param isInEnvelope whether or not the metadata is packaged in an envelope
-     */
-    public void setIsInEnvelope(boolean isInEnvelope) {
-        this.isEnvelope = isInEnvelope;
-    }
-
-    /**
-     * Remember whether or not the metadata takes the form of a list
-     *
-     * @param isList whether or not the metadata takes the form of a list
-     */
-    public void setIsList(boolean isList) {
-        this.isList = isList;
-    }
-    
     /**
      * Close the underlying streams
      */

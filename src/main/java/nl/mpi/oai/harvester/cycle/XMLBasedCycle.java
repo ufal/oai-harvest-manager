@@ -18,13 +18,11 @@
 
 package nl.mpi.oai.harvester.cycle;
 
-import nl.mpi.oai.harvester.generated.EndpointType;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * <br> A harvest cycle implementation based on XML properties <br><br>
@@ -83,72 +81,6 @@ public class XMLBasedCycle implements Cycle {
 
         // get the endpoint from the overview
         return xmlOverview.getEndpoint(URI, group);
-    }
-
-    @Override
-    /**
-     * <br> Get the next residual endpoint in the cycle <br><br>
-     *
-     * As long as an endpoint recorded in the overview has not been returned
-     * to the client by the next method that accepts an externally supplied URI
-     * and group, consider it 'residual'. This method will return the residual
-     * endpoints. <br><br>
-     *
-     * Note: only consider a cycle 'finished' if there are no residual
-     * endpoints. <br><br>
-     *
-     * Since the cycle supports parallel endpoint harvesting, by adding
-     * endpoint URIs to a list, this method checks if a particular endpoint not
-     * yet marked as having been attempted, is currently being attempted. In
-     * the method ensures that every endpoint is returned to the client at most
-     * once. <br><br>
-     *
-     * In deciding whether or not the end of the cycle has been reached, the
-     * method considers the endpoints stored in the overview. It cannot know
-     * about endpoints the client would present the cycle with by passing an
-     * identification to the next method. <br><br>
-     *
-     * @return the next endpoint eligible for harvesting, null if all
-     *         endpoints have been cycled over.
-     */
-    public synchronized Endpoint next() {
-
-        int endpointCount = xmlOverview.overviewType.getEndpoint().size();
-
-        // find an endpoint not yet returned in this cycle
-        for (int i = 0; i < endpointCount; i++) {
-
-            // get the next endpoint in the overview
-            EndpointType endpointType =
-                    xmlOverview.overviewType.getEndpoint().get(i);
-            // get the endpoint's adapter
-            Endpoint endpoint = xmlOverview.getEndpoint(endpointType);
-
-            // get today's date in UTC
-            Date date = new Date ();
-            // prepare it for ISO8601 representation
-            DateTime dateTime = new DateTime(date).toDateTime(DateTimeZone.UTC);
-
-            // get the date the endpoint was attempted
-            DateTime attemptedDate = endpoint.getAttemptedDate();
-
-            // check if the endpoint was attempted today
-            if (attemptedDate.toString().equals(dateTime.toString())) {
-                // endpoint was attempted today, skip it
-            } else {
-                if (endpointsCycled.contains(endpointType.getURI())) {
-                    // endpoint is being attempted, skip it
-                } else {
-                    // add the endpoint to the list of endpoints attempted
-                    endpointsCycled.add(endpointType.getURI());
-                    // like before, return an adapter
-                    return endpoint;
-                }
-            }
-        }
-
-        // no residual endpoint found
-        return null;
     }
 
     // zero epoch time in the UTC zone
@@ -218,90 +150,4 @@ public class XMLBasedCycle implements Cycle {
         return false;
     }
 
-    @Override
-    public boolean doHarvest(String URI) {
-
-        int endpointCount = xmlOverview.overviewType.getEndpoint().size();
-
-        // find an endpoint
-        for (int i = 0; i < endpointCount; i++) {
-
-            EndpointType endpointType =
-                    xmlOverview.overviewType.getEndpoint().get(i);
-
-            if (endpointType.getURI().equals(URI)) {
-                /* Found the endpoint, use adapter to return the endpoint that
-                   corresponds to endpointType.
-                 */
-
-                return doHarvest(xmlOverview.getEndpoint(endpointType));
-            }
-        }
-
-        /* The URI does not match the URI of any of the endpoints in the
-           overview
-         */
-        return false;
-    }
-
-    @Override
-    public DateTime getRequestDate(Endpoint endpoint) {
-
-        // decide on a date the cycle can use when issuing an OAI request
-
-        switch (cycleProperties.getHarvestMode()){
-
-            case normal:
-                if (endpoint.blocked()){
-                    /* Since the cycle should not harvest the endpoint, it
-                       does not need a date.
-                     */
-                    return zeroUTC;
-                } else {
-                    /* The cycle should use the date of the most recent
-                       successful attempt
-                     */
-                    return new DateTime(endpoint.getHarvestedDate(),
-                            DateTimeZone.UTC);
-                }
-
-            case retry:
-                DateTime attempted, harvested;
-
-                if (! endpoint.retry()){
-                    // the cycle should not retry, so it does not need a date
-                    return zeroUTC;
-                } else {
-                    attempted = endpoint.getAttemptedDate();
-                    harvested = endpoint.getHarvestedDate();
-
-                    if (attempted.equals(harvested)) {
-                        /* At some point in time the cycle tried and harvested
-                           the endpoint. Therefore, there is no need for it to
-                           retry.
-                         */
-                        return zeroUTC;
-                    } else {
-                        /* After the most recent success, the cycle attempted
-                           to harvest the endpoint but did not succeed. It can
-                           therefore retry.
-                         */
-                        return new DateTime(endpoint.getHarvestedDate(),
-                                DateTimeZone.UTC);
-                    }
-                }
-
-            case refresh:
-
-                /* No matter what the state of the endpoint is, for refreshing
-                   it, the cycle can do without a date. Return the epoch date.
-                 */
-
-                return zeroUTC;
-
-            default:
-                // all the members of the mode should be covered
-                throw new Exception();
-        }
-    }
 }

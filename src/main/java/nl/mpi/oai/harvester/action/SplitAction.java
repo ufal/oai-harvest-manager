@@ -63,7 +63,7 @@ public class SplitAction implements Action {
     private final DocumentBuilder db;
 
     private enum State {
-        START,RECORD,HEADER,ID,METADATA,STOP,ERROR
+        START,RECORD,HEADER,ID,STOP,ERROR
     }
 
     public SplitAction() throws ParserConfigurationException {

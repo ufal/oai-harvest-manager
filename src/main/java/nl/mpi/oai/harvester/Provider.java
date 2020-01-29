@@ -18,14 +18,9 @@
 
 package nl.mpi.oai.harvester;
 
-import ORG.oclc.oai.harvester2.verb.GetRecord;
 import ORG.oclc.oai.harvester2.verb.Identify;
 import ORG.oclc.oai.harvester2.verb.ListIdentifiers;
-import ORG.oclc.oai.harvester2.verb.ListMetadataFormats;
-import nl.mpi.oai.harvester.action.ActionSequence;
 import nl.mpi.oai.harvester.control.Util;
-import nl.mpi.oai.harvester.harvesting.Harvesting;
-import nl.mpi.oai.harvester.metadata.Metadata;
 import nl.mpi.oai.harvester.metadata.MetadataFormat;
 import nl.mpi.oai.harvester.metadata.NSContext;
 import org.apache.logging.log4j.LogManager;
@@ -83,12 +78,6 @@ public class Provider {
     
     /** Do I need some time on my own? */
     public boolean exclusive = false;
-    
-    /** Type of prefix harvesting that applies to the provider */
-    public Harvesting prefixHarvesting;
-
-    /** Type of list harvesting that applies to the provider */
-    public Harvesting listHarvesting;
 
     /**
      * We make so many XPath queries we could just as well keep one XPath
@@ -190,10 +179,6 @@ public class Provider {
 
     public DeletionMode getDeletionMode() {
         return deletionMode;
-    }
-
-    public void setDeletionMode(DeletionMode deletionMode) {
-        this.deletionMode = deletionMode;
     }
 
     /**
@@ -348,118 +333,6 @@ public class Provider {
     }
 
     /**
-     * Attempt to perform the specified sequence of actions on metadata from
-     * this provider (which, of course, is only possible if this provider
-     * supports the specified input format(s)).
-     *
-     * If the sequence can be performed, this method will start a new thread
-     * to do so and return true. Otherwise no action will be taken and false
-     * will be returned.
-     *
-     * @param ap the sequence of actions
-     * @return success or failure
-     */
-    public boolean performActions(ActionSequence ap) throws XMLStreamException {
-	List<String> prefixes = getPrefixes(ap.getInputFormat());
-	if (prefixes.isEmpty()) {
-	    logger.info("No matching prefixes for format "
-		    + ap.getInputFormat());
-	    return false;
-	}
-
-	// Fetch lr of record identifiers separately for each metadata
-	// prefix corresponding to the metadata format, then collate all in
-	// a single hash (id as key, metadata prefix as value).
-	Map<String, String> identifiers = new HashMap<>();
-	for (String prefix : prefixes) {
-	    List<String> ids;
-	    try {
-		ids = getIdentifiers(prefix);
-	    } catch (ParserConfigurationException | IOException | SAXException
-		    | TransformerException | XPathExpressionException
-		    | NoSuchFieldException ex) {
-		logger.error("Error fetching ids from " + name, ex);
-		return false;
-	    }
-	    for (String id : ids) {
-		identifiers.put(id, prefix);
-	    }
-	}
-
-	for (Map.Entry<String, String> me : identifiers.entrySet()) {
-	    Metadata rec = getRecord(me.getKey(), me.getValue());
-	    if (rec != null) {
-		logger.info("Fetched record " + me.getKey()
-			+ " (format " + me.getValue() + ")");
-		ap.runActions(rec);
-	    }
-	}
-
-        return true;
-    }
-
-    /**
-     * Fetch a single record from this provider.
-     *
-     * @param id OAI-PMH identifier of the record
-     * @param mdPrefix metadata prefix
-     * @return the record, or null if it cannot be fetched
-     */
-	public Metadata getRecord(String id, String mdPrefix) {
-	for (int i=0; i<maxRetryCount; i++) {
-	    try {
-		GetRecord gr = new GetRecord(oaiUrl, id, mdPrefix, timeout);
-                return new Metadata(id, mdPrefix, gr.getDocumentSource(), this, true, false);
-	    } catch (IOException | SAXException | ParserConfigurationException
-		    | TransformerException e) {
-                logger.error("Provider["+this+"] getRecord["+oaiUrl+"]["+id+"]["+mdPrefix+"] try["+(i+1)+"/"+maxRetryCount+"] failed!");
-		logger.error(e);
-	    }
-            // retry the request once more
-            int retryDelay = getRetryDelay(i);
-            if (retryDelay > 0) {
-                try {
-                    Thread.sleep(retryDelay*1000);
-                } catch(InterruptedException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }                
-	}
-	return null;
-    }
-
-    /**
-     * Make an OAI-PMH GetIdentifiers call to collect all identifiers available
-     * with the given metadata prefix from this provider. In case a list of
-     * sets is defined for this provider, a separate call will be made for
-     * each set.
-     *
-     * @param mdPrefix metadata prefix
-     * @return list of identifiers, which may be empty
-     * @throws IOException IO problem
-     * @throws ParserConfigurationException configuration problem
-     * @throws SAXException XML problem
-     * @throws TransformerException XSL problem
-     * @throws XPathExpressionException XPath problem
-     * @throws NoSuchFieldException introspection problem
-     */
-	public List<String> getIdentifiers(String mdPrefix) throws IOException,
-	    ParserConfigurationException, SAXException, TransformerException,
-	    XPathExpressionException, NoSuchFieldException, XMLStreamException {
-	List<String> ids = new ArrayList<>();
-
-	if (sets == null) {
-	    addIdentifiers(mdPrefix, null, ids);
-	} else {
-	    for (String set : sets) {
-		addIdentifiers(mdPrefix, set, ids);
-	    }
-	}
-
-	return ids;
-    }
-
-    /**
      * Make an OAI-PMH GetIdentifiers call to collect all identifiers available
      * with the given Metadata prefix and set from this provider and add them
      * to the given list.
@@ -511,24 +384,6 @@ public class Provider {
     }
 
     /**
-     * Get the list of Metadata prefixes corresponding to the specified format
-     * that are supported by this provider.
-     * @param format format
-     * @return list of metadata prefixes
-     */
-    public List<String> getPrefixes(MetadataFormat format) {
-	logger.debug("Checking format " + format);
-	try {
-	    ListMetadataFormats lmf = new ListMetadataFormats(oaiUrl, timeout);
-	    return parsePrefixes(lmf.getDocument(), format);
-	} catch (TransformerException | XPathExpressionException
-		| ParserConfigurationException | SAXException | IOException e) {
-	    logger.error(e.getMessage(), e);
-	}
-	return Collections.emptyList();
-    }
-
-    /**
      * Parse list of Metadata formats and find prefixes matching the given
      * format specification
      *
@@ -574,17 +429,7 @@ public class Provider {
 	return prefs;
     }
 
-    /**
-     * Check if name matches given string (whether in filesystem
-     * format or not).
-     * @param name name to match
-     * @return match or not
-     */
-    public boolean matches(String name) {
-	return this.name.equals(Util.toFileFormat(name));
-    }
-
-	@Override
+    @Override
     public String toString() {
 	StringBuilder sb = new StringBuilder(name == null ? "provider" : name);
 	if (sets != null) {

@@ -115,36 +115,6 @@ public final class StaticPrefixHarvesting extends FormatHarvesting
         return null;
     }
 
-    /**
-     * <br> Get the prefixes from the static content
-     *
-     * @return false if there was an error, true otherwise
-     */
-    public boolean processResponse() {
-
-        /* Provider is a StaticProvider class object, please refer to the
-           constructor.
-         */
-        StaticProvider p = (StaticProvider) provider;
-
-        try {
-            nodeList = (NodeList) provider.xpath.evaluate(
-                    "//*[local-name() = 'metadataFormat']",
-                    response.getDocument(),
-                    XPathConstants.NODESET);
-        } catch (XPathExpressionException | ParserConfigurationException | SAXException | IOException e) {
-            // could not extract metadata prefixes from the static content.
-            logger.error(e.getMessage(), e);
-            logger.info("Cannot obtain " + actions.getInputFormat() +
-                    " metadata prefixes for from endpoint " + p.oaiUrl);
-            return false;
-        }
-
-        /* Now the nodeList contains a list of prefixes. The superclass
-           methods can process this list.
-         */
-        return true;
-    }
 }
 
 

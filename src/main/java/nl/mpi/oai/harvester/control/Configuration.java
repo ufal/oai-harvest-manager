@@ -580,10 +580,6 @@ public class Configuration {
             return "workspace";
         return s;
     }
-    
-    public Map<String, OutputDirectory> getOutputDirectories() {
-        return outputs;
-    }
 
     public int getMaxRetryCount() {
         String s = settings.get(KnownOptions.RETRYCOUNT.toString());
@@ -660,16 +656,6 @@ public class Configuration {
             }
         }
         return mapFile;
-    }
-
-    /**
-     * @return if the response should be saved
-     */
-    public boolean saveResponse() {
-
-        String s = settings.get(KnownOptions.SAVERESPONSE.toString());
-        if (s == null) return true;
-        return Boolean.valueOf(s);
     }
 
     /**

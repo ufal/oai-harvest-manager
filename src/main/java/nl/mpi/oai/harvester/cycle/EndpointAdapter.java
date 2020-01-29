@@ -194,21 +194,6 @@ class EndpointAdapter implements Endpoint {
 
     }
 
-    @Override
-    public boolean allowRefresh() {
-
-        // try to get attribute, use boolean reference type to check for null
-        Boolean allow = endpointType.isRefresh();
-
-        if (allow == null){
-            // attribute not XML cycle element, add it to it
-            endpointType.setRefresh(false);
-            return false;
-        } else {
-            return allow;
-        }
-    }
-
     // zero epoch time in the UTC zone
     final DateTime zeroUTC = new DateTime ("1970-01-01T00:00:00.000+00:00",
             DateTimeZone.UTC);
