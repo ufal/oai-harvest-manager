@@ -71,7 +71,7 @@ public class RegistryReader {
 
     private HttpURLConnection getConnection(URL url, String contentType) throws IOException {
         HttpURLConnection connection = null;
-        Boolean redirect = false;
+        boolean redirect = false;
 
         do {
             connection = (HttpURLConnection) url.openConnection();

@@ -18,9 +18,6 @@
 
 package nl.mpi.oai.harvester.cycle;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
 import java.io.File;
 import java.util.ArrayList;
 
@@ -49,12 +46,6 @@ public class XMLBasedCycle implements Cycle {
     // overview marshalling object
     private final XMLOverview xmlOverview;
 
-    // the general properties defined by the XML file
-    private final CycleProperties cycleProperties;
-
-    // the endpoint URIs returned to the client in the current cycle
-    private ArrayList<String> endpointsCycled = new ArrayList<>();
-
     /**
      * Associate the cycle with the XML file defining the cycle and endpoint
      * properties
@@ -65,11 +56,6 @@ public class XMLBasedCycle implements Cycle {
 
         // create an cycleProperties marshalling object
         xmlOverview = new XMLOverview(overviewFile);
-
-        cycleProperties = xmlOverview.getCycleProperties();
-
-        // no longer consider endpoints cycled before
-        endpointsCycled = new ArrayList<>();
     }
 
     @Override
@@ -81,73 +67,6 @@ public class XMLBasedCycle implements Cycle {
 
         // get the endpoint from the overview
         return xmlOverview.getEndpoint(URI, group);
-    }
-
-    // zero epoch time in the UTC zone
-    final DateTime zeroUTC = new DateTime ("1970-01-01T00:00:00.000+00:00",
-            DateTimeZone.UTC);
-
-    @Override
-    public boolean doHarvest(Endpoint endpoint) {
-
-        // decide whether or not the endpoint should be harvested
-
-        switch (cycleProperties.getHarvestMode()){
-
-            case normal:
-                if (endpoint.blocked()){
-                    // endpoint has been (temporarily) removed from the cycle
-                    return false;
-                } else {
-                    return true;
-                }
-
-            case retry:
-                DateTime attempted, harvested;
-
-                if (! endpoint.retry()){
-                    // endpoint should not be retried
-                    return false;
-                } else {
-                    attempted = endpoint.getAttemptedDate();
-                    harvested = endpoint.getHarvestedDate();
-
-                    if (attempted.equals(harvested)) {
-                        // check if anything has happened
-                        if (attempted.equals(zeroUTC)){
-                            // apparently not, do harvest
-                            return true;
-                        } else {
-                            /* At some point in time the cycle tried and
-                               harvested the endpoint. Therefore, there is no
-                               need for it to retry.
-                             */
-                            return false;
-                        }
-                    } else {
-                        if (attempted.isBefore(harvested)){
-                            // this will not happen normally
-                            return false;
-                        } else {
-                            /* After the most recent success, the cycle
-                               attempted to harvest the endpoint but did not
-                               succeed. It can therefore retry.
-                            */
-                            return true;
-                        }
-                    }
-                }
-
-            case refresh:
-                if (endpoint.blocked()){
-                    // at the moment, the cycle cannot harvest the endpoint
-                    return false;
-                } else {
-                    return true;
-                }
-        }
-
-        return false;
     }
 
 }

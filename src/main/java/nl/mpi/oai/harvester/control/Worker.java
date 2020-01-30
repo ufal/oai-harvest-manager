@@ -102,6 +102,7 @@ class Worker implements Runnable {
             ThreadContext.put("logFileName", Util.toFileFormat(provider.getName()).replaceAll("/", ""));
             
             String map = config.getMapFile();
+            //FIXME synchronization on local variable
             synchronized(map) {
                 PrintWriter m = null;
                 try {

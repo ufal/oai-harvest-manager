@@ -85,82 +85,6 @@ import org.joda.time.DateTime;
 public interface Endpoint {
 
     /**
-     * <br> Get the endpoint URI <br><br>
-     *
-     * The URI by which the harvest cycle will try to connect to the endpoint.
-     *
-     * @return endpoint URI
-     */
-     String getURI ();
-
-    /**
-     * <br> Get the group <br><br>
-     *
-     * An endpoint belongs to a group. Typically, each group has its own
-     * configuration and list or repository of endpoints. Also, the list of
-     * statistics, contains a reference to the group an endpoint belongs to.
-     *
-     * Please note that some object belonging to a class outside the cycle
-     * package needs to supply the group attribute to the harvest cycle. The
-     * cycle can only determine the group after it has been stored in the
-     * overview. Like the endpoint URI, the group is a parameter to the
-     * endpoint constructor.
-     *
-     * @return the group the endpoint belongs to
-     *
-     */
-    String getGroup ();
-
-    /**
-     * <br> Check if the cycle is allowed to harvest the endpoint <br><br>
-     *
-     * If and only if the endpoint's block attribute is set to true, and the
-     * harvest cycle is in retry mode, it is effectively granted to harvest
-     * the endpoint. If blocked, the cycle will not try to harvest the endpoint,
-     * regardless of any other specification. <br><br>
-     *
-     * Note: there is no method for blocking the endpoint. The decision to
-     * block an endpoint is not part of the harvesting lifecycle itself. It
-     * could be taken, for example, in case the endpoint fails to perform
-     * correctly. Likely, the implementation of overview, contains a definition
-     * of the attribute.
-     *
-     * @return true if the endpoint should be skipped, false otherwise
-     */
-   boolean blocked ();
-
-    /**
-     * <br> Check if the cycle is allow to retry harvesting the endpoint <br><br>
-     *
-     * When the cycle itself is in retry mode, and the endpoint's retry
-     * attribute is set to true, it should retry harvesting the endpoint.
-     *
-     * Note: like getURI, blocked and allowIncremental harvest, the interface
-     * itself does not provide a method that can set the value of the retry
-     * attribute. It needs to be specified elsewhere, for example in a file
-     * that contains the endpoint and general cycle attributes.
-     *
-     * @return true is a retry is allowed, false otherwise
-     */
-    boolean retry();
-
-    /**
-     * <br> Return the date of the most recent harvest attempt <br><br>
-     *
-     * By remembering the date on which the cycle most recently attempted to
-     * harvest an endpoint, it can, by comparing this date to the date on which
-     * it successfully harvested the endpoint, if it needs to retry by issuing
-     * the very same OAI request once again.
-     *
-     * Note: the harvest cycle will implicitly set the date by invoking the
-     * doneHarvesting method.
-     *
-     * @return epoch date if the overview does not contain the date, otherwise
-     * the date of the most recent harvest attempt
-     */
-     DateTime getAttemptedDate();
-
-    /**
      * <br> Return the date of the most recent successful harvest attempt <br><br>
      *
      * After successfully harvesting an endpoint, the cycle should remember the
@@ -187,35 +111,6 @@ public interface Endpoint {
      * @param done true in case of success, false otherwise
      */
      void doneHarvesting(Boolean done);
-
-    /**
-     * <br> Get the record count <br><br>
-     *
-     * The record count reflect the overall total of records harvested. The
-     * counting starts when first harvesting the endpoint, or when the cycle
-     * is in refresh mode. When it is, the cycle needs to set the record count
-     * to the number of records harvested.
-     *
-     * @return the number of records harvested
-     */
-    long getCount ();
-
-    /**
-     * <br> Set record count
-     *
-     * @param count the number of records harvested
-     */
-    void setCount (long count);
-
-    /**
-     * <br> Get the record increment <br><br>
-     *
-     * The number of records harvested from the endpoint in the most recent
-     * harvest cycle.
-     *
-     * @return the increment
-     */
-    long getIncrement ();
 
     /**
      * <br> Set the record increment <br><br>

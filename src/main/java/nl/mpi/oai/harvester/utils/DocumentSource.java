@@ -67,10 +67,6 @@ public class DocumentSource {
         return (str!=null);
     }
 
-    public boolean hasSource() {
-        return (str!=null);
-    }
-    
     public Document getDocument() {
         if (doc==null) {
             try {

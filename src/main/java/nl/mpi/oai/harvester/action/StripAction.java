@@ -285,12 +285,12 @@ public class StripAction implements Action {
                         if (writer != null)
                             writer.close();
                     } catch (XMLStreamException ex) {
+                        logger.error(ex.getMessage());
                     }
                 }
 
             }
         }
-        records.clear();
         records.addAll(newRecords);
         return true;
     }

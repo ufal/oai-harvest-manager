@@ -27,7 +27,6 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * <br> Tests targeting the cycle package <br><br>
@@ -42,8 +41,7 @@ import static org.junit.Assert.fail;
 public class AdapterTest {
 
     // remember the new value when reading back from the updated overview
-    DateTime newAttempted, newHarvested;
-    long newCount, newIncrement;
+    DateTime newHarvested;
 
     // setup a temporary folder for the test, use the junit rule for it
     @Rule
@@ -100,15 +98,8 @@ public class AdapterTest {
         // look at the first endpoint
         Endpoint endpoint = cycle.next("http://www.endpoint1.org", "group1");
 
-        // check the endpoint URI
-        assertEquals("http://www.endpoint1.org", endpoint.getURI());
-
-        // check the group the endpoint belongs to
-        assertEquals("group1", endpoint.getGroup());
-
         // Test the doneHarvesting method. First get both the attempted and
         // harvested date.
-        DateTime attempted = endpoint.getAttemptedDate();
         DateTime harvested = endpoint.getHarvestedDate();
 
         // indicate harvest failure
@@ -117,41 +108,11 @@ public class AdapterTest {
         // this should only have updated the attempted date
         assertEquals(harvested, endpoint.getHarvestedDate());
 
-        // the original attempted date should precede the current date
-        if (! attempted.isBefore(endpoint.getAttemptedDate())){
-            fail();
-        }
-
         // now indicate success
         endpoint.doneHarvesting(true);
 
         // remember the date of the attempt en harvest
-        newAttempted = endpoint.getAttemptedDate();
         newHarvested = endpoint.getHarvestedDate();
-
-        // both dates should now be the same
-        assertEquals(newAttempted, newHarvested);
-
-        // either one should succeed the original dates
-        if (! attempted.isBefore(newAttempted)){
-            fail();
-        }
-
-        // by default, the record count should be zero
-        assertEquals(endpoint.getCount(), 0);
-
-        // set the count, and compare it to the count reported
-        endpoint.setCount(314L);
-        newCount = endpoint.getCount();
-        assertEquals(314L, newCount);
-
-        // by default, the increment should also be zero
-        assertEquals(endpoint.getIncrement(), 0);
-
-        // set the increment, and compare it to the increment reported
-        endpoint.setIncrement(27L);
-        newIncrement = endpoint.getIncrement();
-        assertEquals(27L, newIncrement);
 
         // create a new cycle based on the changed file
         cycle = factory.createCycle(copyOfOverview);
@@ -161,10 +122,7 @@ public class AdapterTest {
 
         // read back the new values, and check if they have indeed been changed
 
-        assertEquals(endpoint.getAttemptedDate(), newAttempted);
         assertEquals(endpoint.getHarvestedDate(), newHarvested);
-        assertEquals(endpoint.getCount(), newCount);
-        assertEquals(endpoint.getIncrement(), newIncrement);
     }
 }
 

@@ -83,8 +83,7 @@ public class Scenario {
                         return prefixes;
                     }
                     // get the prefixes
-                    for (; ; ) {
-                        if (harvesting.fullyParsed()) break;
+                    while (!harvesting.fullyParsed()) {
                         String prefix = (String) harvesting.parseResponse();
                         if (prefix != null) {
                             prefixes.add(prefix);

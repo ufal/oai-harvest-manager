@@ -130,26 +130,6 @@ final class XMLOverview {
     }
 
     /**
-     * <br> Create an adapter for an endpointType object <br><br>
-     *
-     * This method returns the adapter object for the endpoint indicated. <br><br>
-     *
-     * Note: the adapter only makes available the properties for the endpoint
-     * indicated. Other endpoints or general properties defined in the overview
-     * are outside the scope of the adapter.
-     *
-     * @param endpointType the endpoint indicated
-     * @return endpoint properties
-     */
-    public Endpoint getEndpoint (EndpointType endpointType){
-
-        /* Since only methods in the package can invoke this method, assume the
-           endpointType is in place.
-         */
-        return new EndpointAdapter(endpointType.getURI(), endpointType.getGroup(), this);
-    }
-
-    /**
      * <br> Save the overview <br><br>
      */
     public synchronized void save (){

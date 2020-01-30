@@ -145,7 +145,7 @@ public class SplitAction implements Action {
                         int depth = 0;
                         String status = null;
                         String id = null;
-                        while (!state.equals(state.STOP) && !state.equals(state.ERROR)) {
+                        while (!state.equals(State.STOP) && !state.equals(State.ERROR)) {
                             //logger.debug("BEGIN loop: state["+state+"] event["+event+"]["+event.getEventType()+"]");
                             int eventType = event.getEventType();
                             switch (state) {
@@ -279,11 +279,11 @@ public class SplitAction implements Action {
                         if (writer != null)
                             writer.close();
                     } catch (XMLStreamException ex) {
+                        logger.error(ex.getMessage());
                     }
                 }
             }
         }
-        records.clear();
         records.addAll(newRecords);
         return true;
     }

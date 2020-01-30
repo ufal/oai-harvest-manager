@@ -42,11 +42,7 @@ public class CycleTest {
             DateTimeZone.UTC);
 
     @Test
-    /**
-     * Test reflecting and deciding based on an endpoint overview stored in
-     * an XML file.
-     */
-    public void testNormalMode (){
+    public void testNext (){
 
         // create a CycleFactory
         CycleFactory factory = new CycleFactory();
@@ -58,148 +54,20 @@ public class CycleTest {
         // first endpoint
         Endpoint endpoint = cycle.next("http://www.endpoint1.org", "group1");
 
-        // check the endpoint URI
-        assertEquals("http://www.endpoint1.org", endpoint.getURI());
-        /* While the endpoint allows incremental harvesting, the client has
-           not attempted the endpoint before, so it should now try to harvest
-           it from the beginning.
-         */
-        assertTrue(cycle.doHarvest(endpoint));
+        assertEquals("Missing harvestedDate should return zeroUTC", zeroUTC, endpoint.getHarvestedDate());
 
         // second endpoint
         endpoint = cycle.next("http://www.endpoint2.org", "");
 
         // third endpoint
         endpoint = cycle.next("http://www.endpoint3.org", "");
-        // because of a block, the client should not harvest this endpoint
-        assertFalse(cycle.doHarvest(endpoint));
 
         // fourth endpoint
         endpoint = cycle.next("http://www.endpoint4.org", "");
-        // the endpoint does not support incremental harvesting
-        assertTrue(cycle.doHarvest(endpoint));
-        //assertEquals(zeroUTC, cycle.getRequestDate(endpoint));
-
-        DateTime dateTime = new DateTime("2014-07-19T00:00:00.000Z",
-                DateTimeZone.UTC);
 
         // fifth endpoint
         endpoint = cycle.next("http://www.endpoint5.org", "");
-        // the client should harvest this endpoint
-        assertTrue(cycle.doHarvest(endpoint));
-        //assertEquals(dateTime, cycle.getRequestDate(endpoint));
-    }
 
-    @Test
-    /**
-     * Test reflecting and deciding based on an endpoint overview stored in
-     * an XML file.
-     */
-    public void testRetryMode() {
-
-        // create a CycleFactory
-        CycleFactory factory = new CycleFactory();
-
-        // get a cycle based on the test file
-        Cycle cycle = factory.createCycle(TestHelper.getFile(
-                "/OverviewRetryMode.xml"));
-
-        // first endpoint
-        Endpoint endpoint = cycle.next("http://www.endpoint1.org", "");
-
-        // assert some element values
-        assertEquals("http://www.endpoint1.org", endpoint.getURI());
-        assertFalse(endpoint.blocked());
-        assertTrue(endpoint.retry());
-        // with no date in the overview, this endpoint should be harvested
-        assertTrue(cycle.doHarvest(endpoint));
-
-        DateTime dateTime = new DateTime("2014-07-21T00:00:00.000Z",
-                DateTimeZone.UTC);
-
-        // second endpoint
-        endpoint = cycle.next("http://www.endpoint2.org", "");
-        // according to the overview, the endpoint needs another attempt
-        assertTrue(cycle.doHarvest(endpoint));
-        /* Assert the date to use in the request, note that endpoint does not
-           allow for incremental harvesting.
-         */
-        //assertEquals(dateTime, cycle.getRequestDate(endpoint));
-
-        dateTime = new DateTime("2014-12-11T00:00:00.000Z", DateTimeZone.UTC);
-
-        // third endpoint
-        endpoint = cycle.next("http://www.endpoint3.org", "");
-        // this endpoint does allow incremental harvesting
-        //assertEquals(dateTime, cycle.getRequestDate(endpoint));
-        assertTrue(cycle.doHarvest(endpoint));
-
-        // fourth endpoint
-        endpoint = cycle.next("http://www.endpoint4.org", "");
-        /* Since it does not allow incremental harvesting, the client should
-           harvest the endpoint from the beginning.
-         */
-        //assertEquals(zeroUTC, cycle.getRequestDate(endpoint));
-        // but the endpoint is retry false and won't be harvested
-        assertFalse(cycle.doHarvest(endpoint));
-
-        // fifth endpoint
-        endpoint = cycle.next("http://www.endpoint5.org", "");
-        /* When it would allow a retry, the client would need to harvest it
-           from the beginning.
-         */
-        //assertEquals(zeroUTC, cycle.getRequestDate(endpoint));
-        // however, the endpoint does not allow a retry
-        assertFalse(endpoint.retry());
-        assertFalse(cycle.doHarvest(endpoint));
-    }
-
-    @Test
-    /**
-     * Test reflecting and deciding based on an endpoint overview stored in
-     * an XML file.
-     */
-    public void testRefreshMode (){
-
-        // create a CycleFactory
-        CycleFactory factory = new CycleFactory();
-
-        // get a cycle based on the test file
-        Cycle cycle = factory.createCycle(TestHelper.getFile(
-                "/OverviewRefreshMode.xml"));
-
-        // walk over the elements in the file, and assert some of its values
-
-        // first endpoint
-        Endpoint endpoint = cycle.next("http://www.endpoint1.org", "");
-
-        // as it has not tried it before, the client should harvest the endpoint
-        assertTrue(cycle.doHarvest(endpoint));
-        // from the beginning
-        //assertEquals(zeroUTC, cycle.getRequestDate(endpoint));
-
-        // second endpoint
-        endpoint = cycle.next("http://www.endpoint2.org", "");
-
-        // check the endpoint URI
-        assertEquals("http://www.endpoint2.org", endpoint.getURI());
-        /* While the endpoint allows incremental harvesting, in refresh mode the
-           client should be led to disregarding this.
-         */
-        assertTrue(cycle.doHarvest(endpoint));
-        //assertEquals(zeroUTC, cycle.getRequestDate(endpoint));
-
-        // third endpoint
-        endpoint = cycle.next("http://www.endpoint3.org", "");
-        // the client should not refresh a blocked endpoint
-        assertFalse(cycle.doHarvest(endpoint));
-
-        // fourth endpoint
-        endpoint = cycle.next("http://www.endpoint4.org", "");
-        /* According to the overview the client has not successfully harvested
-           the endpoint before.
-         */
-        assertTrue(cycle.doHarvest(endpoint));
-        //assertEquals(zeroUTC, cycle.getRequestDate(endpoint));
+        assertEquals("2014-07-19T00:00:00.000Z", endpoint.getHarvestedDate().toString());
     }
 }

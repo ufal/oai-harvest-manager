@@ -5,7 +5,6 @@ package nl.mpi.oai.harvester.utils;
 **/
 public class Statistic {
 
-    private long harvestTime;
     private long records = 0;
     private long requests = 0;
 
@@ -31,7 +30,6 @@ public class Statistic {
     }
     public long getHarvestTime() {
         long harvestFinishTime = System.currentTimeMillis();
-        harvestTime = (harvestFinishTime - harvestStartTime)/1000;
-        return harvestTime;
+        return (harvestFinishTime - harvestStartTime)/1000;
     }
 }

@@ -63,31 +63,4 @@ public interface Cycle {
      */
     Endpoint next (String URI, String group);
 
-    /**
-     * <br> Check if the endpoint should be harvested <br><br>
-     *
-     * When it decides whether or not the endpoint given should be harvested,
-     * the method will consider both the general cycle properties as well as
-     * the endpoint properties. <br><br>
-     *
-     * If the cycle is in normal mode, the method will allow the client to
-     * harvest the endpoint if endpoint's block attribute equals false. It will
-     * allow selective harvest if on top of that, the incremental attribute
-     * equals true. In that case the client should use the harvested attribute
-     * to set the OAI request date parameter. <br><br>
-     *
-     * If the cycle is in retry mode, the same applies as in the case of the
-     * the normal mode, except that method will return true if the endpoint's
-     * retry attribute is equal to true. <br><br>
-     *
-     * If the cycle is in refresh mode, again, the same applies as in the case
-     * of the normal mode, except that the date will now be determined by the
-     * overview's date attribute takes the place of the endpoint's harvested
-     * attribute.
-     *
-     * @param endpoint the endpoint considered
-     * @return true if and only if the endpoint should be harvested
-     */
-    boolean doHarvest (Endpoint endpoint);
-
 }

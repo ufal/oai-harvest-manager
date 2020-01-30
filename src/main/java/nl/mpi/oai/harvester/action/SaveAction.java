@@ -128,6 +128,7 @@ public class SaveAction implements Action {
                     if (writer != null)
                         writer.close();
                 } catch (IOException | XMLStreamException e) {
+                    logger.error(e.getMessage());
                 }
             }
         }

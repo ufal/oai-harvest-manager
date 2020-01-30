@@ -55,11 +55,6 @@ public class Metadata {
     /** The OAI-PMH provider where this record originated. */
     private final Provider origin;
 
-    // whether or not the metadata is packed in an OAI envelope
-    private boolean isEnvelope;
-    // whether or not the metadata takes the form of a list of records
-    private boolean isList;
-
     /** The XML content of this record. */
     private DocumentSource docSrc;
 
@@ -80,8 +75,6 @@ public class Metadata {
         this.prefix       = prefix;
         this.docSrc       = docSrc;
         this.origin       = endpoint;
-        this.isEnvelope   = isEnvelope;
-        this.isList       = isList;
     }
 
     /**
@@ -101,8 +94,6 @@ public class Metadata {
         this.prefix       = prefix;
         this.docSrc       = new DocumentSource(id,doc);
         this.origin       = endpoint;
-        this.isEnvelope   = isEnvelope;
-        this.isList       = isList;
     }
 
     /**
@@ -122,8 +113,6 @@ public class Metadata {
         this.prefix       = prefix;
         this.docSrc       = new DocumentSource(id,doc);
         this.origin       = endpoint;
-        this.isEnvelope   = isEnvelope;
-        this.isList       = isList;
     }
 
     /**

@@ -90,7 +90,7 @@ class EndpointAdapter implements Endpoint {
         endpointType = null;
 
         // iterate over the elements in the harvested element
-        Boolean found = false;
+        boolean found = false;
 
         // JAXB representation of the overview
         OverviewType overviewType = xmlOverview.overviewType;
@@ -142,79 +142,9 @@ class EndpointAdapter implements Endpoint {
         }
     }
 
-    @Override
-    public String getURI() {
-
-        // the endpoint URI is in place because of the constructor precondition
-        return endpointType.getURI();
-    }
-
-    @Override
-    public String getGroup() {
-
-        // try to get attribute, use boolean reference type to check for null
-        String group = endpointType.getGroup();
-        if (group == null){
-            // set default group, the empty string
-            endpointType.setGroup("");
-            return "";
-        } else {
-            return group;
-        }
-    }
-
-    @Override
-    public boolean blocked() {
-
-        // try to get attribute, use boolean reference type to check for null
-        Boolean blocked = endpointType.isBlock();
-
-        if (blocked == null){
-            // attribute not XML cycle element, add it to it
-            endpointType.setBlock(false);
-            return false;
-        } else {
-            return blocked;
-        }
-    }
-
-    @Override
-    public boolean retry() {
-
-        // try to get attribute, use boolean reference type to check for null
-        Boolean retry = endpointType.isRetry();
-
-        if (retry == null){
-            // attribute not XML cycle element, add it to it
-            endpointType.setRetry(false);
-            return false;
-        } else {
-            return retry;
-        }
-
-    }
-
     // zero epoch time in the UTC zone
     final DateTime zeroUTC = new DateTime ("1970-01-01T00:00:00.000+00:00",
             DateTimeZone.UTC);
-
-    @Override
-    public DateTime getAttemptedDate() {
-
-        XMLGregorianCalendar XMLDate;
-        XMLDate = endpointType.getAttempted();
-
-        if (XMLDate == null){
-            /* Since there is no default value for this property, there is no
-               need to set the date in the overview now. Return the zero epoch
-               date in the UTC zone.
-             */
-            return zeroUTC;
-        } else {
-            // convert XMLGregorianCalendar to DateTime
-            return new DateTime(XMLDate.toString(), DateTimeZone.UTC);
-        }
-    }
 
     @Override
     public DateTime getHarvestedDate() {
@@ -283,45 +213,6 @@ class EndpointAdapter implements Endpoint {
             // report the error, we cannot continue
             Logger.getLogger(EndpointAdapter.class.getName()).log(
                     Level.SEVERE, null, endpointType);
-        }
-    }
-
-    @Override
-    public long getCount() {
-
-        // try to get attribute, use long reference type to check for null
-        Long count = endpointType.getCount();
-
-        if (count == null) {
-            // attribute not XML cycle element, add it to it
-            endpointType.setCount((long) 0);
-            return 0;
-        } else {
-            return count;
-        }
-    }
-
-    @Override
-    public void setCount(long count) {
-
-        // update the count
-        endpointType.setCount(count);
-        // update the overview
-        xmlOverview.save();
-    }
-
-    @Override
-    public long getIncrement() {
-
-        // try to get attribute, use long reference type to check for null
-        Long increment = endpointType.getIncrement();
-
-        if (increment == null){
-            // attribute not XML cycle element, add it to it
-            endpointType.setIncrement(0l);
-            return 0;
-        } else {
-            return increment;
         }
     }
 

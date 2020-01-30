@@ -156,6 +156,7 @@ public class Provider {
 	    try {
                 Files.deleteIfExists(temp);
             } catch (IOException ex) {
+	            logger.error(ex.getMessage());
             }
         }
     }
@@ -330,36 +331,6 @@ public class Provider {
 
     public boolean isExclusive() {
         return this.exclusive;
-    }
-
-    /**
-     * Make an OAI-PMH GetIdentifiers call to collect all identifiers available
-     * with the given Metadata prefix and set from this provider and add them
-     * to the given list.
-     *
-     * @param mdPrefix Metadata prefix
-     * @param set OAI-PMH set, or null for none
-     * @param ids existing list to which identifiers will be added
-     * @throws IOException IO problem
-     * @throws ParserConfigurationException configuration problem
-     * @throws SAXException XML problem
-     * @throws TransformerException XSL problem
-     * @throws XPathExpressionException XPath problem
-     * @throws NoSuchFieldException introspection problem
-     */
-    public void addIdentifiers(String mdPrefix, String set, List<String> ids)
-	    throws IOException, ParserConfigurationException, SAXException,
-	    TransformerException, XPathExpressionException,
-	    NoSuchFieldException, XMLStreamException {
-            ListIdentifiers li = new ListIdentifiers(oaiUrl, null, null, set, mdPrefix, timeout);
-            for (;;) {
-                addIdentifiers(li.getDocument(), ids);
-                String resumption = li.getResumptionToken();
-                if (resumption == null || resumption.isEmpty()) {
-                    break;
-	    }
-	    li = new ListIdentifiers(oaiUrl, resumption, timeout);
-	}
     }
 
     /**
