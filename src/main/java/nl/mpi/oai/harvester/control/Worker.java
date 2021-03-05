@@ -214,7 +214,7 @@ class Worker implements Runnable {
                         }
                     }
                 }
-                // break after an action sequence has completed successfully
+                // break after any (the first) action sequence has completed successfully
                 if (done) break;
             }
 
