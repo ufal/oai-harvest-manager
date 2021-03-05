@@ -314,8 +314,11 @@ public class Configuration {
                     }
                     if (act != null)
                         ac.add(act);
-                    else
+                    else {
                         logger.error("Unknown action[" + actionType + "]");
+                        throw new IllegalArgumentException(String.format("Failed to create action number %s (%s) of %s"
+                                , k, actionType, matchValue));
+                    }
                 }
 
                 ActionSequence ap = new ActionSequence(format, ac.toArray(new Action[ac.size()]),
