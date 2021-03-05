@@ -140,7 +140,9 @@ public class ScenarioTest {
         when(sequence.getInputFormat()).thenReturn(helper.getMetadataFormats());
 
         // get the first provider from the helper
-        Provider endpoint = helper.getFirstEndpoint();
+        Provider endpoint = spy(helper.getFirstEndpoint());
+        when(endpoint.getProviderName()).thenReturn("Language Bank of Finland");
+
         for (; ; ) {
             // create a scenario with the endpoint and the mocked sequence
             Scenario scenario = new Scenario(endpoint, sequence);
