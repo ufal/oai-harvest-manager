@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.file.Path;
-import java.util.concurrent.Semaphore;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import org.apache.logging.log4j.LogManager;

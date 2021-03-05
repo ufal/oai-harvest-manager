@@ -70,9 +70,24 @@ public final class FileSynchronization {
        saveStatistics(provider);
     }
 
+    private static File fileWithMkDirs(String pathname){
+        File file = new File(pathname);
+        try {
+            FileUtils.forceMkdirParent(file);
+        }catch (IOException e){
+            logger.error(e.getMessage(), e);
+        }
+        return file;
+    }
+
+    /**
+     * If there are lines in PROVIDER_remove.txt ({@link #saveFilesToRemove(String, Provider)}) delete files
+     * corresponding to those lines from three hardcoded CMDI directories
+     * @param provider
+     */
     private static void runSynchronizationForTransientDeletionMode(final Provider provider){
         String dir = Main.config.getWorkingDirectory()+ CMDI;
-        File file = new File(dir + Util.toFileFormat(provider.getName())+"_remove.txt");
+        File file = fileWithMkDirs(dir + Util.toFileFormat(provider.getName())+"_remove.txt");
 
         String firstDirToRemove = Main.config.getWorkingDirectory() + CMDI + Util.toFileFormat(provider.getName())+"/";
         String scenedDirToRemove = Main.config.getWorkingDirectory() + CMDI1_1 + Util.toFileFormat(provider.getName())+"/";
@@ -89,7 +104,7 @@ public final class FileSynchronization {
         String dir2 = Main.config.getWorkingDirectory() + CMDI1_2 + Util.toFileFormat(provider.getName());
         String dir3 = Main.config.getWorkingDirectory() + CMDI1_1 + Util.toFileFormat(provider.getName());
 
-        File file = new File(dir1 + "/current.txt");
+        File file = fileWithMkDirs(dir1 + "/current.txt");
         String resumptionToken = null;
         boolean done = false;
 
@@ -235,7 +250,7 @@ public final class FileSynchronization {
 
     public static void saveStatistics(final Provider provider){
         String dir = Main.config.getWorkingDirectory()+ CMDI;
-        File file = new File(dir + Util.toFileFormat(provider.getName())+"_history.xml");
+        File file = fileWithMkDirs(dir + Util.toFileFormat(provider.getName())+"_history.xml");
         Statistic stats = statistic.get(provider);
         StringBuffer sb = new StringBuffer();
           sb.append("<harvest date=\"").append(currentDate).append("\" ")
@@ -262,9 +277,16 @@ public final class FileSynchronization {
     public static void addProviderStatistic(Provider provider){
         statistic.put(provider, new Statistic());
     }
+
+    /**
+     * Keep track of INSERT/DELETE of "records".
+     * @param provider
+     * @param filePath
+     * @param operation
+     */
     public static void saveToHistoryFile(final Provider provider, final Path filePath, final Operation operation){
         String dir = Main.config.getWorkingDirectory()+ CMDI;
-        File file = new File(dir + Util.toFileFormat(provider.getName())+"_history.xml");
+        File file = fileWithMkDirs(dir + Util.toFileFormat(provider.getName())+"_history.xml");
             StringBuffer sb = new StringBuffer();
                      sb.append("<file ")
                         .append("harvestDate=\"").append(currentDate).append("\" ")
@@ -274,9 +296,14 @@ public final class FileSynchronization {
         writeToHistoryFile(file, sb.toString());
     }
 
+    /**
+     * Keep track of deleted records. The files corresponding to deleted records are stored in PROVIDER_remove.txt.
+     * @param file
+     * @param provider
+     */
     public static  void saveFilesToRemove(String file, Provider provider){
         String dir = Main.config.getWorkingDirectory()+ CMDI + Util.toFileFormat(provider.getName());
-        java.io.File toRemove = new java.io.File(dir+"_remove.txt");
+        File toRemove = fileWithMkDirs(dir+"_remove.txt");
         try(FileWriter writer = new FileWriter(toRemove, true)) {
             writer.write(file + "\n");
         } catch (IOException e) {
