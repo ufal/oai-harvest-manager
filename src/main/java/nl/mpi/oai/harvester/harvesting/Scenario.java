@@ -20,7 +20,10 @@ package nl.mpi.oai.harvester.harvesting;
 
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.action.ActionSequence;
+import nl.mpi.oai.harvester.control.FileSynchronization;
+import nl.mpi.oai.harvester.control.Main;
 import nl.mpi.oai.harvester.metadata.Metadata;
+import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,10 +43,10 @@ public class Scenario {
     private static final Logger logger = LogManager.getLogger(Scenario.class);
 
     //
-    Provider provider;
+    final Provider provider;
 
     //
-    ActionSequence actionSequence;
+    final ActionSequence actionSequence;
 
     //
     private static final ReadWriteLock exclusiveLock = new ReentrantReadWriteLock(true);
@@ -169,10 +172,9 @@ public class Scenario {
                 } else {
                     // apply the action sequence to the record
                     actionSequence.runActions(record);
+                    record.close();
                 }
 
-                // FIXME record might be null at this point
-                record.close();
             } finally {
                 if (provider.isExclusive()) {
                     exclusiveLock.writeLock().unlock();
@@ -250,6 +252,46 @@ public class Scenario {
         } while (harvesting.requestMore());
 
         return true;
+    }
+
+    public List<String> getMetadataFormats(OAIFactory oaiFactory){
+        // set type of format harvesting to apply
+        AbstractHarvesting harvesting = new FormatHarvesting(oaiFactory,
+                provider, actionSequence);
+
+        // get the prefixes
+        List<String> prefixes = this.getPrefixes(harvesting);
+        logger.debug("prefixes["+prefixes+"]");
+        return prefixes;
+    }
+
+    public boolean getRecords(String method, OAIFactory oaiFactory, MetadataFactory metadataFactory){
+        // list of prefixes provided by the endpoint
+        List<String> prefixes = getMetadataFormats(oaiFactory);
+        if (prefixes.isEmpty()) {
+            // no match
+            logger.debug("no prefixes[" + prefixes + "] -> done");
+            return false;
+        }
+
+        boolean done;
+        // determine the type of record harvesting to apply
+        if (method.equals("ListIdentifiers")) {
+            // get the records indirectly, first obtaining identifiers
+            done = listIdentifiers(new IdentifierListHarvesting(oaiFactory,
+                    provider, prefixes, metadataFactory, provider.getEndpoint()));
+            logger.debug("list identifiers -> done["+done+"]");
+        } else {
+            // get the records with ListRecords
+            done = listRecords(new RecordListHarvesting(oaiFactory,
+                    provider, prefixes, metadataFactory, provider.getEndpoint()));
+            logger.debug("list records -> done[" + done + "]");
+        }
+        if(Main.config.isIncremental()) {
+            FileSynchronization.execute(provider);
+        }
+        return done;
+
     }
 }
 

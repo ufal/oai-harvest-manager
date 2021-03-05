@@ -19,12 +19,9 @@
 package nl.mpi.oai.harvester.control;
 
 import nl.mpi.oai.harvester.Provider;
-import nl.mpi.oai.harvester.StaticProvider;
 import nl.mpi.oai.harvester.action.ActionSequence;
 import nl.mpi.oai.harvester.cycle.Cycle;
 import nl.mpi.oai.harvester.cycle.Endpoint;
-import nl.mpi.oai.harvester.harvesting.*;
-import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -48,24 +45,15 @@ class Worker implements Runnable {
     
     private static final Logger logger = LogManager.getLogger(Worker.class);
     
-    /** The configuration */
-    private final Configuration config;
-    
     /** The provider this worker deals with. */
     private final Provider provider;
 
     /** List of actionSequences to be applied to the harvested metadata. */
     private final List<ActionSequence> actionSequences;
 
-    /* Harvesting scenario to be applied. ListIdentifiers: first, based on
-       endpoint data and prefix, get a list of identifiers, and after that
-       retrieve each record in the list individually. ListRecords: skip the
-       list, retrieve multiple records per request.
-     */
-    private final String scenarioName;
 
     // kj: annotate
-    Endpoint endpoint;
+    final Endpoint endpoint;
 
     /**
      * Associate a provider and action actionSequences with a scenario
@@ -73,20 +61,18 @@ class Worker implements Runnable {
      * @param provider OAI-PMH provider that this thread will harvest
      * @param cycle the harvesting cycle
      */
-    public Worker(Provider provider, Configuration config,
+    public Worker(Provider provider,
                   Cycle cycle) {
 
-        this.config = config;
-        
 	this.provider = provider;
 
-	this.actionSequences = config.getActionSequences();
+	this.actionSequences = Main.config.getActionSequences();
 
         // register the endpoint with the cycle, kj: get the group
         endpoint = cycle.next(provider.getOaiUrl(), "group");
 
-        // get the name of the scenario the worker needs to apply
-        this.scenarioName = provider.getScenario();
+        // FIXME The Endpoint should be refactored further
+        provider.setEndpoint(endpoint);
     }
 
     @Override
@@ -100,119 +86,20 @@ class Worker implements Runnable {
 
             // setting specific log filename
             ThreadContext.put("logFileName", Util.toFileFormat(provider.getName()).replaceAll("/", ""));
-            
-            String map = config.getMapFile();
-            //FIXME synchronization on local variable
-            synchronized(map) {
-                PrintWriter m = null;
-                try {
-                    m = new PrintWriter(new FileWriter(map,true));
-                    if (config.hasRegistryReader()) {
-                        m.println(config.getRegistryReader().endpointMapping(provider.getOaiUrl(),provider.getName()));
-                    } else {
-                        m.printf("%s,%s,,", provider.getOaiUrl(),Util.toFileFormat(provider.getName()).replaceAll("/", ""));
-                        m.println();
-                    }
-                } catch (IOException e) {
-                    logger.error("failed to write to the map file!",e);
-                } finally {
-                    if (m!=null)
-                        m.close();
-                }
-            }
+            writeProviderToMapFile(provider);
 
             boolean done = false;
 
-            // factory for metadata records
-            MetadataFactory metadataFactory = new MetadataFactory();
-
-            // factory for OAI verbs
-            OAIFactory oaiFactory = new OAIFactory();
-
-            logger.info("Processing provider[" + provider + "] using scenario[" + scenarioName + "], incremental[" + provider.getIncremental() + "], timeout[" + provider.getTimeout() + "] and retry[count="+provider.getMaxRetryCount()+",delays="+Arrays.toString(provider.getRetryDelays())+"]");
+            logger.info("Processing provider[" + provider + "] using scenario[" + provider.getScenario() + "], incremental[" + provider.getIncremental() + "], timeout[" + provider.getTimeout() + "] and retry[count="+provider.getMaxRetryCount()+",delays="+Arrays.toString(provider.getRetryDelays())+"]");
 
             FileSynchronization.addProviderStatistic(provider);
 
             for (final ActionSequence actionSequence : actionSequences) {
                 
-                if(config.isDryRun()) {
+                if(Main.config.isDryRun()) {
                     logger.info("Dry run mode. Skipping action sequence: {{}}", actionSequence.toString());
                 } else {
-                    // list of prefixes provided by the endpoint
-                    List<String> prefixes;
-
-                    // kj: annotate
-                    Scenario scenario = new Scenario(provider, actionSequence);
-
-                    if (provider instanceof StaticProvider) {
-                        logger.debug("static harvest["+provider+"]");
-
-                        // set type of format harvesting to apply
-                        AbstractHarvesting harvesting = new StaticPrefixHarvesting(
-                                oaiFactory,
-                                (StaticProvider) provider,
-                                actionSequence);
-                        logger.debug("harvesting["+harvesting+"]");
-
-                        // get the prefixes
-                        prefixes = scenario.getPrefixes(harvesting);
-                        logger.debug("prefixes["+prefixes+"]");
-
-                        if (prefixes.isEmpty()) {
-                            logger.debug("no prefixes["+prefixes+"] -> done");
-                            done = false;
-                        } else {
-                            // set type of record harvesting to apply
-                            harvesting = new StaticRecordListHarvesting(oaiFactory,
-                                    (StaticProvider) provider, prefixes, metadataFactory);
-
-                            // get the records
-                            if (scenarioName.equals("ListIdentifiers")) {
-                                done = scenario.listIdentifiers(harvesting);
-                                logger.debug("list identifiers -> done["+done+"]");
-                            } else {
-                                done = scenario.listRecords(harvesting);
-                                logger.debug("list records -> done["+done+"]");
-                            }
-                        }
-                    } else {
-                        logger.debug("dynamic harvest["+provider+"]");
-
-                        // set type of format harvesting to apply
-                        AbstractHarvesting harvesting = new FormatHarvesting(oaiFactory,
-                                provider, actionSequence);
-
-                        // get the prefixes
-                        prefixes = scenario.getPrefixes(harvesting);
-                        logger.debug("prefixes["+prefixes+"]");
-
-                        if (prefixes.isEmpty()) {
-                            // no match
-                            logger.debug("no prefixes["+prefixes+"] -> done");
-                            done = false;
-                        } else {
-                            // determine the type of record harvesting to apply
-                            if (scenarioName.equals("ListIdentifiers")) {
-                                // kj: annotate, connect verb to scenario
-                                harvesting = new IdentifierListHarvesting(oaiFactory,
-                                        provider, prefixes, metadataFactory, endpoint);
-
-                                // get the records
-                                done = scenario.listIdentifiers(harvesting);
-                                logger.debug("list identifiers -> done["+done+"]");
-                            } else {
-                                harvesting = new RecordListHarvesting(oaiFactory,
-                                        provider, prefixes, metadataFactory, endpoint);
-
-                                // get the records
-                                done = scenario.listRecords(harvesting);
-                                logger.debug("list records -> done[" + done + "]");
-                            }
-                            if(Main.config.isIncremental()) {
-                                FileSynchronization.execute(provider);
-                            }
-                        }
-                    }
+                    done = provider.harvest(actionSequence);
                 }
                 // break after any (the first) action sequence has completed successfully
                 if (done) break;
@@ -220,7 +107,7 @@ class Worker implements Runnable {
 
             // report back success or failure to the cycle
             endpoint.doneHarvesting(done);
-            if (config.isIncremental()) {
+            if (Main.config.isIncremental()) {
                 FileSynchronization.saveStatistics(provider);
                 endpoint.setIncrement(FileSynchronization.getProviderStatistic(provider).getHarvestedRecords());
             }
@@ -241,6 +128,20 @@ class Worker implements Runnable {
                 logger.info("Processing finished for " + provider);
 
             logger.debug("Goodbye from OAI Harvest Manager worker!");
+        }
+    }
+
+    private static synchronized void writeProviderToMapFile(Provider provider) {
+        String map = Main.config.getMapFile();
+        try(PrintWriter m = new PrintWriter(new FileWriter(map,true))) {
+            if (Main.config.hasRegistryReader()) {
+                m.println(Main.config.getRegistryReader().endpointMapping(provider.getOaiUrl(),provider.getName()));
+            } else {
+                m.printf("%s,%s,,", provider.getOaiUrl(),Util.toFileFormat(provider.getName()).replaceAll("/", ""));
+                m.println();
+            }
+        } catch (IOException e) {
+            logger.error("failed to write to the map file!",e);
         }
     }
 

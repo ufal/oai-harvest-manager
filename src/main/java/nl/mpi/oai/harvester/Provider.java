@@ -19,21 +19,21 @@
 package nl.mpi.oai.harvester;
 
 import ORG.oclc.oai.harvester2.verb.Identify;
-import ORG.oclc.oai.harvester2.verb.ListIdentifiers;
-import nl.mpi.oai.harvester.control.Util;
-import nl.mpi.oai.harvester.metadata.MetadataFormat;
+import nl.mpi.oai.harvester.action.ActionSequence;
+import nl.mpi.oai.harvester.cycle.Endpoint;
+import nl.mpi.oai.harvester.harvesting.OAIFactory;
+import nl.mpi.oai.harvester.harvesting.Scenario;
+import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.metadata.NSContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -42,7 +42,6 @@ import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
 
 /**
  * This class represents a single OAI-PMH provider.
@@ -94,6 +93,15 @@ public class Provider {
 	 * Provider deletion mode
 	 */
 	public DeletionMode deletionMode;
+
+    private Endpoint endpoint;
+
+    // factory for metadata records
+    final MetadataFactory metadataFactory = new MetadataFactory();
+
+    // factory for OAI verbs
+    final OAIFactory oaiFactory = new OAIFactory();
+
 
     /**
      * Provider constructor
@@ -280,10 +288,24 @@ public class Provider {
         return DeletionMode.NO;
     }
 
+    public boolean harvest(ActionSequence actionSequence){
+        logger.debug("dynamic harvest["+this+"]");
+
+        Scenario s = new Scenario(this, actionSequence);
+        String method = getScenario();
+        return s.getRecords(method, oaiFactory, metadataFactory);
+    }
+
     public void setScenario(String scenario) {
         this.scenario = scenario;
     }
-    
+
+    /**
+       Harvesting scenario to be applied. ListIdentifiers: first, based on
+       endpoint data and prefix, get a list of identifiers, and after that
+       retrieve each record in the list individually. ListRecords: skip the
+       list, retrieve multiple records per request.
+     **/
     public String getScenario() {
         return this.scenario;
     }
@@ -345,6 +367,14 @@ public class Provider {
 	}
 	sb.append(" @ ").append(oaiUrl);
 	return sb.toString();
+    }
+
+    public void setEndpoint(Endpoint endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public Endpoint getEndpoint(){
+        return endpoint;
     }
 
 	public enum DeletionMode {
