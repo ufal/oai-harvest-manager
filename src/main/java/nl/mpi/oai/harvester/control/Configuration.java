@@ -517,7 +517,7 @@ public class Configuration {
                 continue;
             }
 
-            logger.info("Provider[" + pUrl + "] scenario[" + pScenario + "] timeout[" + timeout + "] retry[" + maxRetryCount + "," + retryDelays + "]");
+            logger.info("Provider[" + pUrl + "] scenario[" + scenario + "] timeout[" + timeout + "] retry[" + maxRetryCount + "," + retryDelays + "]");
             Provider provider = (Boolean.valueOf(pStatic)) ? new StaticProvider(pUrl, maxRetryCount, retryDelays) : new Provider(pUrl, maxRetryCount, retryDelays);
 
             if (pName != null)
