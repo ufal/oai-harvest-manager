@@ -6,9 +6,9 @@ import datetime
 import os
 import sys
 import re
-import urlparse
+import urllib.parse
 
-class OaiHarvestError(StandardError):
+class OaiHarvestError(Exception):
     def __init__(self, message, args=[]):
         self.message = message
         self.args = args
@@ -150,7 +150,7 @@ class OaiHarvest:
         local.env["PROPS"] = self.jvm
         conf = None
         if re.match("http(s)?://.*",self.confdir):
-            conf = urlparse.urljoin(self.confdir, self.config_file)
+            conf = urllib.parse.urljoin(self.confdir, self.config_file)
         else:
             conf = os.path.join(self.confdir, self.config_file)
         command = [
@@ -198,7 +198,7 @@ class OaiHarvest:
         search_directory=os.path.join(self.workdir, dir)
 
         if not os.path.isdir(search_directory):
-            print "Directory doesn't exist: %s" % search_directory
+            print("Directory doesn't exist: %s" % search_directory)
             return None
 
         destination = search_directory.replace(self.workdir, self.outputdir)
@@ -375,7 +375,7 @@ class App(cli.Application):
             sys.exit(1)
         except:
             e = sys.exc_info()[0]
-            print e
+            print(e)
             sys.exit(1)
         else:
             sys.exit(0)
