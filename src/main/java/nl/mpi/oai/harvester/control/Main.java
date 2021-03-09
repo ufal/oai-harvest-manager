@@ -129,7 +129,7 @@ public class Main {
         // use jaxp.debug (-Djaxp.debug=true) to see what gets used
 		System.setProperty("javax.xml.transform.TransformerFactory",
 				"net.sf.saxon.TransformerFactoryImpl");
-		System.setProperty("javax.xml.xpath.XPathFactory",
+		System.setProperty("javax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom",
 				"net.sf.saxon.xpath.XPathFactoryImpl");
 
 		// Some endpoints behave differently when you're not a browser, so fake it
