@@ -138,6 +138,9 @@ public class Provider {
 
 	XPathFactory xpf = XPathFactory.newInstance();
 	xpath = xpf.newXPath();
+    if(logger.isDebugEnabled()){
+        logger.debug("The actual xpath class is " + xpath.getClass());
+    }
 	NSContext nsContext = new NSContext();
 	nsContext.add("oai", "http://www.openarchives.org/OAI/2.0/");
 	nsContext.add("os", "http://www.openarchives.org/OAI/2.0/static-repository");

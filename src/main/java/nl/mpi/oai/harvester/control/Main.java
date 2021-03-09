@@ -71,16 +71,7 @@ public class Main {
         
 	String configFile = null;
 
-	// Select Saxon XSLT/XPath implementation (necessary in case there
-        // are other XSLT/XPath libraries in classpath).
-        System.setProperty("javax.xml.transform.TransformerFactory",    
-            "net.sf.saxon.TransformerFactoryImpl");
-        System.setProperty("javax.xml.xpath.XPathFactory",
-            "net.sf.saxon.xpath.XPathFactoryImpl");
-    
-        // Some endpoints behave differently when you're not a browser, so fake it
-        System.setProperty("http.agent",
-            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+	setSystemProperties();
 
 	// If the "config" parameter is specified, take it as the
 	// configuration file name.
@@ -127,4 +118,24 @@ public class Main {
         logger.info("Goodbye from the main OAI Harvest Manager!");
 
     }
+
+    public static void setSystemProperties(){
+		// Select Saxon XSLT/XPath implementation (necessary in case there
+		// are other XSLT/XPath libraries in classpath).
+        // This must also be set for the tests.
+		// Saxon 10.3 doesn't register xpathfactory automatically https://www.saxonica.com/documentation/#!xpath-api/jaxp-xpath/factory
+		// and the test will fail while using org.apache.xpath.jaxp.XPathImpl
+		// can also be set from command line with -Djavax.xml.xpath.XPathFactory:http://java.sun.com/jaxp/xpath/dom=net.sf.saxon.xpath.XPathFactoryImpl
+        // use jaxp.debug (-Djaxp.debug=true) to see what gets used
+		System.setProperty("javax.xml.transform.TransformerFactory",
+				"net.sf.saxon.TransformerFactoryImpl");
+		System.setProperty("javax.xml.xpath.XPathFactory",
+				"net.sf.saxon.xpath.XPathFactoryImpl");
+
+		// Some endpoints behave differently when you're not a browser, so fake it
+		System.setProperty("http.agent",
+				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+
+
+	}
 }
