@@ -101,26 +101,29 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.10.6</version>
+            <version>2.10.10</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.8.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <!-- XXX this is the last version that has org.mockito.internal.util.reflection.FieldSetter
+                 StaticProviderTest depends on that -->
             <version>3.4.6</version>
+            <scope>test</scope>
         </dependency>
   
 
