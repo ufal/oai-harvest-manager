@@ -21,23 +21,17 @@ import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.NodeList;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import com.google.common.base.Charsets;
 import java.util.Collection;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * Tests for RegistryReader. (Only parsing of canned responses is tested. No
@@ -138,7 +132,7 @@ public class RegistryReaderTest {
     private static String getResourceAsString(String resourceName) throws IOException {
         final String registryOverviewString;
         try (InputStream infoResourceStream = RegistryReaderTest.class.getResourceAsStream(resourceName)) {
-            registryOverviewString = IOUtils.toString(infoResourceStream, Charsets.UTF_8.name());
+            registryOverviewString = IOUtils.toString(infoResourceStream, StandardCharsets.UTF_8);
         }
         return registryOverviewString;
     }

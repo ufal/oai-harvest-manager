@@ -146,12 +146,7 @@
             <version>2.27.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>29.0-jre</version>
-        </dependency>
-    
+
         <!-- for java 11 -->
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -220,7 +215,7 @@
                 </executions>
             </plugin>
 
-            <!-- Configure the java compiler version, set it to 1.8 -->
+            <!-- Configure the java compiler version, set it to 11 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

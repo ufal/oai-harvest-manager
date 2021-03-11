@@ -18,9 +18,6 @@
 
 package nl.mpi.oai.harvester.control;
 
-import com.google.common.base.Predicates;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableSet;
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.StaticProvider;
 import nl.mpi.oai.harvester.action.*;
@@ -40,8 +37,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import static org.mockito.Mockito.reset;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -50,15 +45,8 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 
 
 /**
@@ -70,7 +58,7 @@ import java.util.Set;
 public class Configuration {
     private static final Logger logger = LogManager.getLogger(Configuration.class);
     private static final Set<String> DEFAULT_EXCLUDE_SETS = Collections.emptySet();
-    private static final Set<String> DEFAULT_INCLUDE_SETS = ImmutableSet.of("*");
+    private static final Set<String> DEFAULT_INCLUDE_SETS = Set.of("*");
 
     private final XPath xpath;
     private RegistryReader registryReader = null;
@@ -351,7 +339,8 @@ public class Configuration {
             final Node includeSetTypesNode = (Node) xpath.evaluate("./includeOaiPmhSetTypes", importNode,XPathConstants.NODE);
             final Collection<String> includeSetTypes;
             if(includeSetTypesNode != null) {
-                includeSetTypes = Splitter.onPattern("\\s*,\\s*").splitToList(includeSetTypesNode.getTextContent());
+                includeSetTypes =
+                        Collections.unmodifiableCollection(Arrays.asList(includeSetTypesNode.getTextContent().split("\\s*,\\s*")));
             } else {
                  includeSetTypes= DEFAULT_INCLUDE_SETS;
             }
@@ -360,7 +349,8 @@ public class Configuration {
             final Node excludeSetTypesNode = (Node) xpath.evaluate("./excludeOaiPmhSetTypes", importNode,XPathConstants.NODE);
             final Collection<String> excludeSetTypes;
             if(excludeSetTypesNode != null) {
-                excludeSetTypes = Splitter.onPattern("\\s*,\\s*").splitToList(excludeSetTypesNode.getTextContent());
+                excludeSetTypes =
+                        Collections.unmodifiableCollection(Arrays.asList(excludeSetTypesNode.getTextContent().split("\\s*,\\s*")));
             } else {
                 excludeSetTypes = DEFAULT_EXCLUDE_SETS;
             }
@@ -471,7 +461,7 @@ public class Configuration {
                                 if(!includeSetTypes.contains("*")) {
                                     //reduce to entries with type matching entry from include types
                                     includedSets.removeIf(
-                                            Predicates.not(s -> includeSetTypes.contains(s.getSetType())));
+                                            Predicate.not(s -> includeSetTypes.contains(s.getSetType())));
                                 }                            
                                 if(!excludeSetTypes.isEmpty()) {
                                     includedSets.removeIf(s -> excludeSetTypes.contains(s.getSetType()));

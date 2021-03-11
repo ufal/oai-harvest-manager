@@ -10,7 +10,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import com.google.common.base.Charsets;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,11 +17,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.action.Action;
 import nl.mpi.oai.harvester.action.ActionSequence;
@@ -164,7 +163,7 @@ public class ConfigurationTest {
             if (stream == null) {
                 throw new IOException("Resource not found");
             }
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8.name()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
                 final File tempFile = File.createTempFile(getClass().getName(), ".xml");
                 tempFile.deleteOnExit();
 
@@ -208,7 +207,7 @@ public class ConfigurationTest {
     private String getResourceAsString(String resourceName) throws IOException {
         final String registryOverviewString;
         try (InputStream infoResourceStream = getClass().getResourceAsStream(resourceName)) {
-            registryOverviewString = IOUtils.toString(infoResourceStream, Charsets.UTF_8.name());
+            registryOverviewString = IOUtils.toString(infoResourceStream, StandardCharsets.UTF_8);
         }
         return registryOverviewString;
     }
