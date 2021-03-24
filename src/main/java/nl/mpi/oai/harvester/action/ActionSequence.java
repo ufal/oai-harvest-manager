@@ -139,7 +139,6 @@ public class ActionSequence {
                 } else
                         logger.debug("Action " + action + " was performed");
                             
-                actPool.release(action);
 
         }
     }
