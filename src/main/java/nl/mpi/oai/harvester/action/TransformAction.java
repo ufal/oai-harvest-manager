@@ -18,14 +18,8 @@
 
 package nl.mpi.oai.harvester.action;
 
-import net.sf.saxon.s9api.DOMDestination;
-import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XdmAtomicValue;
-import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.XsltTransformer;
+import net.sf.saxon.s9api.*;
 import nl.mpi.oai.harvester.metadata.Metadata;
-import nl.mpi.tla.util.Saxon;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -42,6 +36,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
@@ -52,8 +47,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.SourceLocator;
-import net.sf.saxon.s9api.MessageListener;
-import net.sf.saxon.s9api.XsltExecutable;
 
 /**
  * This class represents the application of an XSL transformation to the
@@ -78,6 +71,9 @@ public class TransformAction implements Action {
     
     /** The configuration */
     private Node config;
+
+    private static final Processor processor = new Processor(false);
+    private static final XsltCompiler xsltCompiler = processor.newXsltCompiler();
 
     /** 
      * Create a new transform action using the specified XSLT. 
@@ -113,12 +109,13 @@ public class TransformAction implements Action {
         this.cacheDir = cacheDir;
         this.semaphore = semaphore;
         Source xslSource = null;
-        if (xsltFile.startsWith("http:") || xsltFile.startsWith("https:"))
+        if (xsltFile.startsWith("http:") || xsltFile.startsWith("https:")) {
             xslSource = new StreamSource(xsltFile);
-        else
-            xslSource = new StreamSource(new FileInputStream(xsltFile),xsltFile);
+        }else {
+            xslSource = new StreamSource(new FileInputStream(xsltFile), xsltFile);
+        }
 
-        executable = Saxon.buildTransformer(Saxon.buildDocument(xslSource));
+        executable = xsltCompiler.compile(xslSource);
         
     }
 
@@ -144,7 +141,6 @@ public class TransformAction implements Action {
                 } else {
                     source = new DOMSource(record.getDoc());
                 }
-                XdmNode old = Saxon.buildDocument(source);
                 XsltTransformer transformer = executable.load();
                 
                 TransformActionListener listener = new TransformActionListener();
@@ -156,10 +152,10 @@ public class TransformAction implements Action {
                     transformer.setURIResolver(new TransformActionURLResolver(transformer.getURIResolver()));
                 }
                 
-                transformer.setSource(old.asSource());
+                transformer.setSource(source);
                 transformer.setDestination(output);
 
-                transformer.setParameter(new QName("config"), Saxon.wrapNode(this.config.getOwnerDocument()));
+                transformer.setParameter(new QName("config"), processor.newDocumentBuilder().wrap(this.config.getOwnerDocument()));
                 transformer.setParameter(new QName("provider_name"), new XdmAtomicValue(record.getOrigin().getName()));
                 transformer.setParameter(new QName("provider_uri"), new XdmAtomicValue(record.getOrigin().getOaiUrl()));
                 transformer.setParameter(new QName("record_identifier"), new XdmAtomicValue(record.getId()));
@@ -238,7 +234,7 @@ public class TransformAction implements Action {
             } else {
                 res = resolver.resolve(href, base);
                 try {
-                    Saxon.save(res, cacheDir.resolve(cacheFile).toFile());
+                    save(res, cacheDir.resolve(cacheFile).toFile());
                     logger.debug("Transformer resolver: stored "+cacheFile+" in cache");
                 } catch (SaxonApiException ex) {
                     throw new TransformerException(ex);
@@ -246,6 +242,12 @@ public class TransformAction implements Action {
             }
             return res;
         }
+    }
+
+    private static void save(Source source, File file) throws SaxonApiException {
+        final Serializer serializer = processor.newSerializer(file);
+        final XdmNode res = processor.newDocumentBuilder().build(source);
+        processor.writeXdmValue(res, serializer);
     }
 
     class TransformActionListener implements MessageListener, ErrorListener {
