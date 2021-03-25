@@ -691,10 +691,12 @@ public class Configuration {
      */
     public boolean isIncremental() {
         String s = settings.get(KnownOptions.INCREMENTAL.toString());
-        boolean r = (s == null) ? false : Boolean.valueOf(s);
-        if (r)
-            logger.warn("Incremental harvesting cannot be enabled ... needs to be finished!");
-        return false;
+        boolean incremental = Boolean.parseBoolean(s);
+        if(incremental) {
+            logger.warn("Incremental harvesting is experimental, is not deleting files and with NO as deletion mode " +
+                    "it will grab all identifiers again.");
+        }
+        return incremental;
     }
     
     /**

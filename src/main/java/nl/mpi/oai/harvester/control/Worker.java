@@ -107,7 +107,7 @@ class Worker implements Runnable {
 
             // report back success or failure to the cycle
             endpoint.doneHarvesting(done);
-            if (Main.config.isIncremental()) {
+            if (provider.getIncremental()) {
                 FileSynchronization.saveStatistics(provider);
                 endpoint.setIncrement(FileSynchronization.getProviderStatistic(provider).getHarvestedRecords());
             }

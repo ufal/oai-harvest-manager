@@ -287,7 +287,7 @@ public class Scenario {
                     provider, prefixes, metadataFactory, provider.getEndpoint()));
             logger.debug("list records -> done[" + done + "]");
         }
-        if(Main.config.isIncremental()) {
+        if(provider.getIncremental()) {
             FileSynchronization.execute(provider);
         }
         return done;
