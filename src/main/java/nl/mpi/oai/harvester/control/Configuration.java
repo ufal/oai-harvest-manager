@@ -119,7 +119,7 @@ public class Configuration {
 
     {
         try {
-            jaxbContext = JAXBContext.newInstance(Provider.class);
+            jaxbContext = JAXBContext.newInstance(Provider.class, StaticProvider.class);
             unmarshaller = jaxbContext.createUnmarshaller();
         } catch (JAXBException e) {
             e.printStackTrace();

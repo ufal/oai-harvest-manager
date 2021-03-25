@@ -69,6 +69,10 @@ public class StaticProvider extends Provider {
 	super(oaiUrl, maxRetryCount, retryDelays);
     }
 
+    public StaticProvider() throws ParserConfigurationException{
+    	super();
+	}
+
     /**
      * Create a new static provider based on the provided contents.
      * 

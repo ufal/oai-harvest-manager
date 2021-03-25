@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import nl.mpi.oai.harvester.Provider;
+import nl.mpi.oai.harvester.StaticProvider;
 import nl.mpi.oai.harvester.action.Action;
 import nl.mpi.oai.harvester.action.ActionSequence;
 import org.apache.commons.io.IOUtils;
@@ -98,8 +99,30 @@ public class ConfigurationTest {
     public void testProviders() throws Exception {
         final List<Provider> providers = getBasicConfig().getProviders();
         assertNotNull(providers);
-        assertEquals(1, providers.size());
+        assertEquals(4, providers.size());
         assertEquals("https://www.meertens.knaw.nl/flat/oai2", providers.get(0).getOaiUrl());
+    }
+
+    @Test
+    public void testOldStyleStaticProvider() throws Exception {
+        final List<Provider> providers = getBasicConfig().getProviders();
+        assertNotNull(providers);
+        assertEquals(4, providers.size());
+        assertTrue(providers.get(1) instanceof StaticProvider);
+    }
+    @Test
+    public void testStaticProvider() throws Exception {
+        final List<Provider> providers = getBasicConfig().getProviders();
+        assertNotNull(providers);
+        assertEquals(4, providers.size());
+        assertTrue(providers.get(2) instanceof StaticProvider);
+    }
+    @Test
+    public void testBasicProviderSets() throws Exception{
+        final List<Provider> providers = getBasicConfig().getProviders();
+        assertNotNull(providers);
+        assertEquals(4, providers.size());
+        assertEquals(2, providers.get(3).getSets().length);
     }
 
     @Test
