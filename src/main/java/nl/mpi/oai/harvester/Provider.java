@@ -76,7 +76,7 @@ public class Provider {
     public int[] retryDelays;
     
     /** Maximum timeout for a connection */
-    public Integer timeout = 0;
+    public Integer timeout;
     
     /** Do I need some time on my own? */
     public boolean exclusive = false;
