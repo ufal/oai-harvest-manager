@@ -29,6 +29,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -110,6 +114,18 @@ public class Configuration {
     
     private String mapFile = "map.csv";
 
+    JAXBContext jaxbContext;
+    Unmarshaller unmarshaller;
+
+    {
+        try {
+            jaxbContext = JAXBContext.newInstance(Provider.class);
+            unmarshaller = jaxbContext.createUnmarshaller();
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Create a new configuration object based on a configuration file.
      */
@@ -135,6 +151,7 @@ public class Configuration {
     public Configuration readConfig(String filename) throws ParserConfigurationException,
             SAXException, XPathExpressionException, IOException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(filename);
 
@@ -490,52 +507,53 @@ public class Configuration {
                 XPathConstants.NODESET);
         for (int j = 0; j < prov.getLength(); j++) {
             Node cur = prov.item(j);
-            String pName = Util.getNodeText(xpath, "./@name", cur);
-            String pUrl = Util.getNodeText(xpath, "./@url", cur);
-            String pStatic = Util.getNodeText(xpath, "./@static", cur);
-            String pScenario = Util.getNodeText(xpath, "./@scenario", cur);
-            String pTimeout = Util.getNodeText(xpath, "./@timeout", cur);
-            String pMaxRetryCount = Util.getNodeText(xpath, "./@max-retry-count", cur);
-            String pRetryDelays = Util.getNodeText(xpath, "./@retry-delay", cur);
-            String pExclusive = Util.getNodeText(xpath, "./@exclusive", cur);
 
-            int timeout = (pTimeout != null) ? Integer.valueOf(pTimeout) : getTimeout();
-            int maxRetryCount = (pMaxRetryCount != null) ? Integer.valueOf(pMaxRetryCount) : getMaxRetryCount();
-            int[] retryDelays = (pRetryDelays != null)?parseRetryDelays(pRetryDelays):getRetryDelays();
-            boolean exclusive = Boolean.parseBoolean(pExclusive);
-            String scenario = (pScenario != null) ?  pScenario : getScenario();
+            final Provider provider = readProvider(cur);
 
-            if (pUrl == null) {
-                logger.error("Skipping provider " + pName + ": URL is missing");
+
+            if (provider.oaiUrl == null) {
+                logger.error("Skipping provider " + provider.name + ": URL is missing");
                 continue;
             }
 
-            logger.info("Provider[" + pUrl + "] scenario[" + scenario + "] timeout[" + timeout + "] retry[" + maxRetryCount + "," + retryDelays + "]");
-            Provider provider = (Boolean.valueOf(pStatic)) ? new StaticProvider(pUrl, maxRetryCount, retryDelays) : new Provider(pUrl, maxRetryCount, retryDelays);
+            logger.info("Provider[" + provider.getOaiUrl() + "] scenario[" + provider.getScenario() + "] timeout[" + provider.getTimeout() + "] retry[" + provider.getMaxRetryCount() + "," + provider.getRetryDelays() + "]");
 
-            if (pName != null)
-                provider.setName(pName);
-
-            provider.setTimeout(timeout);
-            provider.setExclusive(exclusive);
-            provider.setIncremental(isIncremental());
-            provider.setScenario(scenario);
-
-            if (!Boolean.valueOf(pStatic)) {
-                // Note: static providers do not support sets, so this only
-                // needs to be done here.
-                NodeList sets = (NodeList) xpath.evaluate("./set", cur,
-                        XPathConstants.NODESET);
-                if (sets != null && sets.getLength() > 0) {
-                    ArrayList<String> setSpec = new ArrayList<>();
-                    for (int k = 0; k < sets.getLength(); k++) {
-                        Node s = sets.item(k);
-                        setSpec.add(s.getTextContent());
-                    }
-                    provider.setSets(setSpec.toArray(new String[setSpec.size()]));
-                }
-            }
             providers.add(provider);
+        }
+    }
+
+    private Provider readProvider(Node node){
+        try {
+            boolean isStatic = Boolean.parseBoolean(Util.getNodeText(xpath, "./@static", node));
+            final Provider provider;
+            if (isStatic) {
+                JAXBElement<StaticProvider> je = unmarshaller.unmarshal(node, StaticProvider.class);
+                provider = je.getValue();
+                logger.warn("Using @static is deprecated; use xsi:type=\"staticProvider\" instead");
+            } else {
+                provider = (Provider) unmarshaller.unmarshal(node);
+            }
+
+            // default if not set
+            if (provider.timeout == null) {
+                provider.setTimeout(getTimeout());
+            }
+            if (provider.maxRetryCount == null) {
+                provider.setMaxRetryCount(getMaxRetryCount());
+            }
+            if (provider.retryDelays == null) {
+                provider.setRetryDelays(getRetryDelays());
+            }
+            if (provider.scenario == null) {
+                provider.setScenario(getScenario());
+            }
+            if (provider.incremental == null) {
+                provider.setIncremental(isIncremental());
+            }
+            return provider;
+        }catch (XPathExpressionException | JAXBException e){
+            logger.error(e);
+            throw new RuntimeException(e);
         }
     }
 

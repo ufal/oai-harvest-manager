@@ -31,6 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.bind.annotation.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,6 +49,8 @@ import java.nio.file.Path;
  *
  * @author Lari Lampen (MPI-PL)
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.NONE)
 public class Provider {
     private static final Logger logger = LogManager.getLogger(Provider.class);
 
@@ -58,22 +61,22 @@ public class Provider {
     public String scenario;
 
     /** Incremental used for this provider. */
-    public boolean incremental;
+    public Boolean incremental;
 
     /** Address through which the OAI repository is accessed. */
-    public final String oaiUrl;
+    public String oaiUrl;
 
     /** List of OAI sets to harvest (optional). */
     public String[] sets = null;
 
     /** Maximum number of retries to use when a connection fails. */
-    public int maxRetryCount = 0;
+    public Integer maxRetryCount;
 
     /** Maximum number of retries to use when a connection fails. */
-    public int[] retryDelays = {0};
+    public int[] retryDelays;
     
     /** Maximum timeout for a connection */
-    public int timeout = 0;
+    public Integer timeout = 0;
     
     /** Do I need some time on my own? */
     public boolean exclusive = false;
@@ -121,31 +124,27 @@ public class Provider {
     public Provider(String url, int maxRetryCount, int[] retryDelays)
             throws ParserConfigurationException {
 
-	// If the base URL is given with parameters (most often
-	// ?verb=Identify), strip them off to get a uniform
-	// representation.
-	if (url != null && url.contains("?"))
-	    url = url.substring(0, url.indexOf("?"));
-	this.oaiUrl = url;
+        this();
+        setOaiUrl(url);
+        setMaxRetryCount(maxRetryCount);
+        setRetryDelays(retryDelays);
+    }
 
-	this.maxRetryCount = maxRetryCount;
-        
-        this.retryDelays = retryDelays;
-
+    public Provider() throws ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         // note: the dbf might throw the checked ParserConfigurationException
         db = dbf.newDocumentBuilder();
 
-	XPathFactory xpf = XPathFactory.newInstance();
-	xpath = xpf.newXPath();
-    if(logger.isDebugEnabled()){
-        logger.debug("The actual xpath class is " + xpath.getClass());
-    }
-	NSContext nsContext = new NSContext();
-	nsContext.add("oai", "http://www.openarchives.org/OAI/2.0/");
-	nsContext.add("os", "http://www.openarchives.org/OAI/2.0/static-repository");
-	xpath.setNamespaceContext(nsContext);
-        
+        XPathFactory xpf = XPathFactory.newInstance();
+        xpath = xpf.newXPath();
+        if(logger.isDebugEnabled()){
+            logger.debug("The actual xpath class is " + xpath.getClass());
+        }
+        NSContext nsContext = new NSContext();
+        nsContext.add("oai", "http://www.openarchives.org/OAI/2.0/");
+        nsContext.add("os", "http://www.openarchives.org/OAI/2.0/static-repository");
+        xpath.setNamespaceContext(nsContext);
+
         try {
             temp = Files.createTempFile("oai-",null);
         } catch (IOException ex) {
@@ -198,10 +197,12 @@ public class Provider {
      *
      * @param name name of provider
      */
+    @XmlAttribute
     public void setName(String name) {
 	this.name = name;
     }
 
+    @XmlElement(name="set")
     public void setSets(String[] sets) {
 	this.sets = sets;
     }
@@ -214,6 +215,16 @@ public class Provider {
         if (name==null)
             fetchName();
 	return name;
+    }
+
+    @XmlAttribute(name="url")
+    public void setOaiUrl(String url) {
+        // If the base URL is given with parameters (most often
+        // ?verb=Identify), strip them off to get a uniform
+        // representation.
+        if (url != null && url.contains("?"))
+            url = url.substring(0, url.indexOf("?"));
+        this.oaiUrl = url;
     }
 
     public String getOaiUrl() {
@@ -299,6 +310,7 @@ public class Provider {
         return s.getRecords(method, oaiFactory, metadataFactory);
     }
 
+    @XmlAttribute
     public void setScenario(String scenario) {
         this.scenario = scenario;
     }
@@ -313,14 +325,16 @@ public class Provider {
         return this.scenario;
     }
 
+    @XmlAttribute
     public void setIncremental(boolean incremental) {
         this.incremental = incremental;
     }
     
     public boolean getIncremental() {
-        return this.incremental;
+        return incremental != null && incremental;
     }
 
+    @XmlAttribute
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
@@ -329,6 +343,7 @@ public class Provider {
         return this.timeout;
     }
 
+    @XmlAttribute
     public void setMaxRetryCount(int maxRetryCount) {
         this.maxRetryCount = maxRetryCount;
     }
@@ -337,6 +352,7 @@ public class Provider {
         return this.maxRetryCount;
     }
 
+    @XmlAttribute(name="retry-delay")
     public void setRetryDelays(int[] retryDelays) {
         this.retryDelays = retryDelays;
     }
@@ -350,6 +366,7 @@ public class Provider {
         return this.retryDelays[retry];
     }
 
+    @XmlAttribute
     public void setExclusive(boolean exclusive) {
         this.exclusive = exclusive;
     }
