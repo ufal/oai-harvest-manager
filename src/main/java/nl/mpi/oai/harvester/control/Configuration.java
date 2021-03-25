@@ -436,28 +436,12 @@ public class Configuration {
                             logger.debug("Excluding endpoint" + provUrl);
                         } else {
                             logger.debug("Including endpoint" + provUrl);
-                            Provider provider = new Provider(provUrl, getMaxRetryCount(), getRetryDelays());
+                            Provider provider;
                             if (configMap.containsKey(provUrl)) {
                                 Node configNode = configMap.get(provUrl);
-                                String pScenario = Util.getNodeText(xpath, "./@scenario", configNode);
-                                String pTimeout = Util.getNodeText(xpath, "./@timeout", configNode);
-                                String pMaxRetryCount = Util.getNodeText(xpath, "./@max-retry-count", configNode);
-                                String pRetryDelays = Util.getNodeText(xpath, "./@retry-delay", configNode);
-                                String pExclusive = Util.getNodeText(xpath, "./@exclusive", configNode);
-
-                                int timeout = (pTimeout != null) ? Integer.valueOf(pTimeout) : getTimeout();
-                                int maxRetryCount = (pMaxRetryCount != null) ? Integer.valueOf(pMaxRetryCount) : getMaxRetryCount();
-                                int[] retryDelays = (pRetryDelays != null) ? parseRetryDelays(pRetryDelays) : getRetryDelays();
-                                boolean exclusive = Boolean.parseBoolean(pExclusive);
-                                String scenario = (pScenario != null) ? pScenario : getScenario();
-
-                                provider.setTimeout(timeout);
-                                provider.setMaxRetryCount(maxRetryCount);
-                                provider.setRetryDelays(retryDelays);
-                                provider.setExclusive(exclusive);
-                                provider.setIncremental(isIncremental());
-                                provider.setScenario(scenario);
+                                provider = readProvider(configNode);
                             } else {
+                                provider = new Provider(provUrl, getMaxRetryCount(), getRetryDelays());
                                 provider.setTimeout(getTimeout());
                                 provider.setMaxRetryCount(getMaxRetryCount());
                                 provider.setRetryDelays(getRetryDelays());
