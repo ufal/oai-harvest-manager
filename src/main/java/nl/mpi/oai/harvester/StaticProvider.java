@@ -171,6 +171,6 @@ public class StaticProvider extends Provider {
 
     @Override
     public String toString() {
-	return name + " (static) @ " + oaiUrl;
+        return "Static " + super.toString();
     }
 }

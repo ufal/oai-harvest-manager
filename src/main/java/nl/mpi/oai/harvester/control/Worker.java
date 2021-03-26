@@ -90,8 +90,7 @@ class Worker implements Runnable {
 
             boolean done = false;
 
-            logger.info("Processing provider[" + provider + "] using scenario[" + provider.getScenario() + "], incremental[" + provider.getIncremental() + "], timeout[" + provider.getTimeout() + "] and retry[count="+provider.getMaxRetryCount()+",delays="+Arrays.toString(provider.getRetryDelays())+"]");
-
+            logger.info("Processing provider[" + provider + "]");
             FileSynchronization.addProviderStatistic(provider);
 
             for (final ActionSequence actionSequence : actionSequences) {

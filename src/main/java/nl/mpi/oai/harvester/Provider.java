@@ -43,6 +43,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 /**
  * This class represents a single OAI-PMH provider.
@@ -377,16 +378,17 @@ public class Provider {
 
     @Override
     public String toString() {
-	StringBuilder sb = new StringBuilder(name == null ? "provider" : name);
-	if (sets != null) {
-	    sb.append(" (only set(s):");
-	    for (String s : sets) {
-		sb.append(" ").append(s);
-	    }
-	    sb.append(")");
-	}
-	sb.append(" @ ").append(oaiUrl);
-	return sb.toString();
+        return "Provider{" +
+                "name='" + name + '\'' +
+                ", oaiUrl='" + oaiUrl + '\'' +
+                ", scenario='" + scenario + '\'' +
+                ", incremental=" + incremental +
+                ", sets=" + Arrays.toString(sets) +
+                ", maxRetryCount=" + maxRetryCount +
+                ", retryDelays=" + Arrays.toString(retryDelays) +
+                ", timeout=" + timeout +
+                ", exclusive=" + exclusive +
+                '}';
     }
 
     public void setEndpoint(Endpoint endpoint) {

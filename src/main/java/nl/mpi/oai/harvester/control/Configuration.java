@@ -501,7 +501,7 @@ public class Configuration {
                 continue;
             }
 
-            logger.info("Provider[" + provider.getOaiUrl() + "] scenario[" + provider.getScenario() + "] timeout[" + provider.getTimeout() + "] retry[" + provider.getMaxRetryCount() + "," + provider.getRetryDelays() + "]");
+            logger.info(provider.toString());
 
             providers.add(provider);
         }
