@@ -122,7 +122,8 @@ public class Configuration {
             jaxbContext = JAXBContext.newInstance(Provider.class, StaticProvider.class);
             unmarshaller = jaxbContext.createUnmarshaller();
         } catch (JAXBException e) {
-            e.printStackTrace();
+            logger.error(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -518,6 +519,7 @@ public class Configuration {
                 provider = (Provider) unmarshaller.unmarshal(node);
             }
 
+            // TODO this is odd way to provide defaults
             // default if not set
             if (provider.timeout == null) {
                 provider.setTimeout(getTimeout());
