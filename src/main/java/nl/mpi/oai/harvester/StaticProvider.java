@@ -150,7 +150,7 @@ public class StaticProvider extends Provider {
     private void fetchContent() {
 	if (providerContent == null && oaiUrl != null) {
 	    try {
-		Identify ident = new Identify(oaiUrl,timeout);
+		Identify ident = new Identify(oaiUrl, getTimeout());
 		providerContent = ident.getDocument();
 	    } catch (IOException | ParserConfigurationException | SAXException
 		    | TransformerException e) {

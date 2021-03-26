@@ -246,7 +246,7 @@ public class Provider {
      */
     public String getProviderName() {
         try {
-            Identify ident = new Identify(oaiUrl, timeout);
+            Identify ident = new Identify(oaiUrl, getTimeout());
             return parseProviderName(ident.getDocument());
         } catch (IOException | ParserConfigurationException | SAXException
                     | TransformerException e) {
@@ -257,7 +257,7 @@ public class Provider {
 
     public DeletionMode getProviderDeletionMode() {
         try {
-            Identify ident = new Identify(oaiUrl, timeout);
+            Identify ident = new Identify(oaiUrl, getTimeout());
             return parseDeletionMode(ident.getDocument());
         } catch (IOException | ParserConfigurationException | SAXException
                 | TransformerException e) {
@@ -340,7 +340,7 @@ public class Provider {
     }
     
     public int getTimeout() {
-        return this.timeout;
+        return timeout != null ? timeout : 0;
     }
 
     @XmlAttribute
