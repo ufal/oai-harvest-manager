@@ -246,18 +246,18 @@ public class Configuration {
         NodeList nodeList = (NodeList) xpath.evaluate("./format", base,
                 XPathConstants.NODESET);
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node curr = nodeList.item(i);
-            String matchType = Util.getNodeText(xpath, "./@match", curr);
-            String matchValue = Util.getNodeText(xpath, "./@value", curr);
+            Node currentFormatNode = nodeList.item(i);
+            String matchType = Util.getNodeText(xpath, "./@match", currentFormatNode);
+            String matchValue = Util.getNodeText(xpath, "./@value", currentFormatNode);
             MetadataFormat format = new MetadataFormat(matchType, matchValue);
 
-            NodeList actions = (NodeList) xpath.evaluate("./action", curr,
+            NodeList actionNodes = (NodeList) xpath.evaluate("./action", currentFormatNode,
                     XPathConstants.NODESET);
-            if (actions != null && actions.getLength() > 0) {
-                ArrayList<Action> ac = new ArrayList<>();
-                for (int k = 0; k < actions.getLength(); k++) {
-                    Node s = actions.item(k);
-                    String actionType = Util.getNodeText(xpath, "./@type", s);
+            if (actionNodes != null && actionNodes.getLength() > 0) {
+                ArrayList<Action> currentFormatActions = new ArrayList<>();
+                for (int k = 0; k < actionNodes.getLength(); k++) {
+                    Node actionNode = actionNodes.item(k);
+                    String actionType = Util.getNodeText(xpath, "./@type", actionNode);
                     Action act = null;
                     if ("strip".equals(actionType)) {
                         try {
@@ -272,17 +272,17 @@ public class Configuration {
                             logger.error(ex);
                         }
                     } else if ("save".equals(actionType)) {
-                        String outDirId = Util.getNodeText(xpath, "./@dir", s);
-                        boolean history = Boolean.parseBoolean(Util.getNodeText(xpath, "./@history", s));
-                        String suffix = Util.getNodeText(xpath, "./@suffix", s);
+                        String outDirId = Util.getNodeText(xpath, "./@dir", actionNode);
+                        boolean history = Boolean.parseBoolean(Util.getNodeText(xpath, "./@history", actionNode));
+                        String suffix = Util.getNodeText(xpath, "./@suffix", actionNode);
 
                         // if null defaults to false, only "true" leads to true
-                        boolean offload = Boolean.parseBoolean(Util.getNodeText(xpath, "./@offload", s));
+                        boolean offload = Boolean.parseBoolean(Util.getNodeText(xpath, "./@offload", actionNode));
 
                         if (outputs.containsKey(outDirId)) {
                             OutputDirectory outDir = outputs.get(outDirId);
                             String group = Util.getNodeText(xpath,
-                                    "./@group-by-provider", s);
+                                    "./@group-by-provider", actionNode);
                             // If the group-by-provider attribute is
                             // not defined, it defaults to true.
                             if (group != null && !Boolean.valueOf(group)) {
@@ -296,16 +296,16 @@ public class Configuration {
                         }
                     } else if ("transform".equals(actionType)) {
                         try {
-                            String xslFile = Util.getNodeText(xpath, "./@file", s);
+                            String xslFile = Util.getNodeText(xpath, "./@file", actionNode);
                             Path cache = null;
-                            String cacheDir = Util.getNodeText(xpath, "./@cache", s);
+                            String cacheDir = Util.getNodeText(xpath, "./@cache", actionNode);
                             if (cacheDir != null) {
                                 Path workDir = Paths.get(getWorkingDirectory());
                                 cache = workDir.resolve(cacheDir);
                                 Util.ensureDirExists(cache);
                             }
                             int jobs = 0;
-                            String jobsStr = Util.getNodeText(xpath, "./@max-jobs", s);
+                            String jobsStr = Util.getNodeText(xpath, "./@max-jobs", actionNode);
                             if (jobsStr != null) {
                                 try {
                                     jobs = Integer.parseInt(jobsStr);
@@ -319,7 +319,7 @@ public class Configuration {
                         }
                     }
                     if (act != null)
-                        ac.add(act);
+                        currentFormatActions.add(act);
                     else {
                         logger.error("Unknown action[" + actionType + "]");
                         throw new IllegalArgumentException(String.format("Failed to create action number %s (%s) of %s"
@@ -327,7 +327,7 @@ public class Configuration {
                     }
                 }
 
-                ActionSequence ap = new ActionSequence(format, ac.toArray(new Action[ac.size()]),
+                ActionSequence ap = new ActionSequence(format, currentFormatActions.toArray(new Action[0]),
                         getResourcePoolSize());
                 actionSequences.add(ap);
             } else {
