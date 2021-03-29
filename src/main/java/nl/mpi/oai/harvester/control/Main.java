@@ -29,8 +29,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -56,13 +57,16 @@ public class Main {
 	File OverviewFile = new File (config.getOverviewFile());
 	Cycle cycle = factory.createCycle(OverviewFile);
 
-	for (Provider provider : config.getProviders()) {
-            // create a new worker
-	    Worker worker = new Worker(provider, cycle);
-            executor.execute(worker);
-	}
-        
-        executor.shutdown();
+		final List<Callable<Object>> workers = config.getProviders().stream()
+				.map(provider -> new Worker(provider, cycle))
+				.map(Executors::callable)
+				.collect(Collectors.toList());
+		try {
+			executor.invokeAll(workers);
+		} catch (InterruptedException e) {
+			logger.error(e);
+		}
+		executor.shutdown();
     }
 
     public static void main(String[] args) {

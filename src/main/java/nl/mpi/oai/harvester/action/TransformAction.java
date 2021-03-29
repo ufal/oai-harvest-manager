@@ -44,7 +44,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.SourceLocator;
 
@@ -60,20 +60,21 @@ public class TransformAction implements Action {
     /** The XSL executable. */
     private final XsltExecutable executable;
 
+    private final int maxJobs;
+
     /** The file containing the XSL transformation. */
     private String xsltFile;
 
     /** The directory containing cached resources. */
     private Path cacheDir;
     
-    /** A standard semaphore is used to track the number of running transforms. */
-    private Semaphore semaphore;
-    
     /** The configuration */
     private Node config;
 
     private static final Processor processor = new Processor(false);
     private static final XsltCompiler xsltCompiler = processor.newXsltCompiler();
+
+    private AtomicInteger runningTransformationsCounter;
 
     /** 
      * Create a new transform action using the specified XSLT. 
@@ -86,9 +87,9 @@ public class TransformAction implements Action {
      * @throws java.net.MalformedURLException
      * @throws net.sf.saxon.s9api.SaxonApiException
      */
-    public TransformAction(Node conf, String xsltFile,Path cacheDir,int maxJobs)
+    public TransformAction(Node conf, String xsltFile,Path cacheDir, int maxJobs)
       throws FileNotFoundException, TransformerConfigurationException, MalformedURLException, SaxonApiException {
-        this(conf, xsltFile,cacheDir,(maxJobs>0?new Semaphore(maxJobs):null));
+        this(conf, xsltFile,cacheDir, maxJobs, new AtomicInteger());
     }
     
     /** 
@@ -96,19 +97,18 @@ public class TransformAction implements Action {
      * 
      * @param xsltFile the XSL stylesheet
      * @param cacheDir the directory to cache results of resource requests
-     * @param semaphore a semaphore to control the concurrent number of transforms
+     * @param counter the shared counter to keep track of concurrent transformers
      * @throws FileNotFoundException stylesheet couldn't be found
-     * @throws TransformerConfigurationException there is a problem with the stylesheet
-     * @throws java.net.MalformedURLException
      * @throws net.sf.saxon.s9api.SaxonApiException
      */
-    public TransformAction(Node conf, String xsltFile,Path cacheDir,Semaphore semaphore)
-      throws FileNotFoundException, TransformerConfigurationException, MalformedURLException, SaxonApiException {
+    private TransformAction(Node conf, String xsltFile,Path cacheDir, int maxJobs, AtomicInteger counter)
+      throws FileNotFoundException, SaxonApiException {
+        assert maxJobs > 0: "maxJobs should be non zero";
+        this.maxJobs = maxJobs;
         this.config = conf;
 	      this.xsltFile = xsltFile;
         this.cacheDir = cacheDir;
-        this.semaphore = semaphore;
-        Source xslSource = null;
+        Source xslSource;
         if (xsltFile.startsWith("http:") || xsltFile.startsWith("https:")) {
             xslSource = new StreamSource(xsltFile);
         }else {
@@ -116,22 +116,17 @@ public class TransformAction implements Action {
         }
 
         executable = xsltCompiler.compile(xslSource);
-        
+        runningTransformationsCounter = counter;
     }
 
     @Override
     public boolean perform(List<Metadata> records) {
         for (Metadata record:records) {
             try {
-                if (semaphore!=null) {
-                    for (;;) {
-                        try {
-                            logger.debug("request transform action");
-                            semaphore.acquire();
-                            logger.debug("acquired transform action");
-                            break;
-                        } catch (InterruptedException e) { }
-                    }
+                assert runningTransformationsCounter.incrementAndGet() <= maxJobs: "You have a concurrency issue";
+                if(logger.isDebugEnabled()){
+                    logger.debug("==== counter=" + runningTransformationsCounter.get() + "; this does not work " +
+                            "without assertions enabled");
                 }
                 Source source = null;
                 Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -167,10 +162,7 @@ public class TransformAction implements Action {
                 logger.error("Transformation error: ",ex);
                 return false;
             } finally {
-                if (semaphore!=null) {
-                    semaphore.release();
-                    logger.debug("released transform action");
-                }
+                assert runningTransformationsCounter.decrementAndGet() >= 0: "You have a concurrency issue";
             }
         }
         return true;
@@ -199,8 +191,8 @@ public class TransformAction implements Action {
     public Action clone() {
 	      try {
 	          // This is a deep copy. The new object has its own Transform object.
-	          return new TransformAction(config, xsltFile,cacheDir,semaphore);
-	      } catch (FileNotFoundException | TransformerConfigurationException | MalformedURLException | SaxonApiException ex) {
+	          return new TransformAction(config, xsltFile,cacheDir, maxJobs, runningTransformationsCounter);
+	      } catch (FileNotFoundException | SaxonApiException ex) {
 	          logger.error(ex);
 	      }
 	      return null;

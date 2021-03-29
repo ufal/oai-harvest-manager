@@ -254,10 +254,11 @@ public class Configuration {
             NodeList actionNodes = (NodeList) xpath.evaluate("./action", currentFormatNode,
                     XPathConstants.NODESET);
             if (actionNodes != null && actionNodes.getLength() > 0) {
-                ArrayList<Action> currentFormatActions = new ArrayList<>();
+                ActionSequence actionSequence = new ActionSequence(format);
                 for (int k = 0; k < actionNodes.getLength(); k++) {
                     Node actionNode = actionNodes.item(k);
                     String actionType = Util.getNodeText(xpath, "./@type", actionNode);
+                    int jobs = getResourcePoolSize();
                     Action act = null;
                     if ("strip".equals(actionType)) {
                         try {
@@ -304,7 +305,9 @@ public class Configuration {
                                 cache = workDir.resolve(cacheDir);
                                 Util.ensureDirExists(cache);
                             }
-                            int jobs = 0;
+                            //If there are multiple transform action with the same file (they are equal()) in the config
+                            //the pool size depends only on the jobs of the first appearance
+                            //It doesn't seem to make sense to increase this above global resource pool size
                             String jobsStr = Util.getNodeText(xpath, "./@max-jobs", actionNode);
                             if (jobsStr != null) {
                                 try {
@@ -318,8 +321,9 @@ public class Configuration {
                             logger.error(ex);
                         }
                     }
-                    if (act != null)
-                        currentFormatActions.add(act);
+                    if (act != null) {
+                        actionSequence.add(act, jobs);
+                    }
                     else {
                         logger.error("Unknown action[" + actionType + "]");
                         throw new IllegalArgumentException(String.format("Failed to create action number %s (%s) of %s"
@@ -327,9 +331,7 @@ public class Configuration {
                     }
                 }
 
-                ActionSequence ap = new ActionSequence(format, currentFormatActions.toArray(new Action[0]),
-                        getResourcePoolSize());
-                actionSequences.add(ap);
+                actionSequences.add(actionSequence);
             } else {
                 logger.warn("A format has no actions defined; skipping it");
             }

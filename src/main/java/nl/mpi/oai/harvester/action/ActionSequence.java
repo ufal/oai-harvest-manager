@@ -64,13 +64,16 @@ public class ActionSequence {
      */
     public ActionSequence(MetadataFormat inputFormat, Action[] theActions,
 	    int resourcePoolSize) {
-	this.inputFormat = inputFormat;
-
-	actions = new ArrayList<>();
+        this(inputFormat);
 
 	for (Action act : theActions) {
 	    actions.add(getPool(act, resourcePoolSize));
 	}
+    }
+
+    public ActionSequence(MetadataFormat inputFormat) {
+        this.inputFormat = inputFormat;
+        actions = new ArrayList<>();
     }
 
     /**
@@ -129,9 +132,12 @@ public class ActionSequence {
         for (ResourcePool<Action> actPool : actions) {
                 // claim an action in the pool
                 Action action = actPool.get();
-
-                boolean done = action.perform(metadata);
-                actPool.release(action);
+                boolean done;
+                try {
+                    done = action.perform(metadata);
+                }finally {
+                    actPool.release(action);
+                }
                 if (!done) {
                         logger.error("Action " + action + " failed, terminating" +
                                         " sequence");
@@ -156,5 +162,9 @@ public class ActionSequence {
 	    }
 	}
 	return sb.toString();
+    }
+
+    public void add(Action act, int resourcePoolSize) {
+        actions.add(getPool(act, resourcePoolSize));
     }
 }
