@@ -58,23 +58,23 @@ public class TransformAction implements Action {
     private static final Logger logger = LogManager.getLogger(TransformAction.class);
     
     /** The XSL executable. */
-    private final XsltExecutable executable;
+    XsltExecutable executable;
 
-    private final int maxJobs;
+    final int maxJobs;
 
     /** The file containing the XSL transformation. */
-    private String xsltFile;
+    String xsltFile;
 
     /** The directory containing cached resources. */
-    private Path cacheDir;
+    Path cacheDir;
     
     /** The configuration */
-    private Node config;
+    Node config;
 
     private static final Processor processor = new Processor(false);
-    private static final XsltCompiler xsltCompiler = processor.newXsltCompiler();
+    static final XsltCompiler xsltCompiler = processor.newXsltCompiler();
 
-    private AtomicInteger runningTransformationsCounter;
+    AtomicInteger runningTransformationsCounter;
 
     /** 
      * Create a new transform action using the specified XSLT. 
@@ -101,23 +101,34 @@ public class TransformAction implements Action {
      * @throws FileNotFoundException stylesheet couldn't be found
      * @throws net.sf.saxon.s9api.SaxonApiException
      */
-    private TransformAction(Node conf, String xsltFile,Path cacheDir, int maxJobs, AtomicInteger counter)
+    TransformAction(Node conf, String xsltFile,Path cacheDir, int maxJobs, AtomicInteger counter)
       throws FileNotFoundException, SaxonApiException {
         assert maxJobs > 0: "maxJobs should be non zero";
         this.maxJobs = maxJobs;
         this.config = conf;
 	      this.xsltFile = xsltFile;
         this.cacheDir = cacheDir;
-        Source xslSource;
+        Source xslSource = getSourceFromFile();
+
+        final long compileStart = System.currentTimeMillis();
+        executable = xsltCompiler.compile(xslSource);
+        final long compileEnd = System.currentTimeMillis();
+        if(logger.isDebugEnabled()){
+            logger.debug(String.format("The compilation of %s took %s ms", xsltFile, compileEnd - compileStart));
+        }
+        runningTransformationsCounter = counter;
+    }
+
+    Source getSourceFromFile() throws FileNotFoundException {
+        final Source xslSource;
         if (xsltFile.startsWith("http:") || xsltFile.startsWith("https:")) {
             xslSource = new StreamSource(xsltFile);
         }else {
             xslSource = new StreamSource(new FileInputStream(xsltFile), xsltFile);
         }
-
-        executable = xsltCompiler.compile(xslSource);
-        runningTransformationsCounter = counter;
+        return xslSource;
     }
+
 
     @Override
     public boolean perform(List<Metadata> records) {

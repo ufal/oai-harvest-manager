@@ -84,7 +84,8 @@ public class ActionSequence {
 	    int size) {
     	if (!pooledActions.containsKey(action)) {
 	    Action[] acts = new Action[size];
-	    for (int i = 0; i < size; i++) {
+	    acts[0] = action;
+	    for (int i = 1; i < size; i++) {
 		acts[i] = action.clone();
 	    }
 	    ResourcePool<Action> pool = new ResourcePool<>(acts);

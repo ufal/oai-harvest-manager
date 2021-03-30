@@ -316,7 +316,13 @@ public class Configuration {
                                     logger.error("@max-jobs[" + jobsStr + "] doesn't contain a valid number", e);
                                 }
                             }
-                            act = new TransformAction(base, xslFile, cache, jobs);
+                            boolean staticParam = Boolean.valueOf(Util.getNodeText(xpath, "./@staticParam",
+                                    actionNode));
+                            if(staticParam){
+                                act = new StaticParamTransformAction(base, xslFile, cache, jobs);
+                            }else {
+                                act = new TransformAction(base, xslFile, cache, jobs);
+                            }
                         } catch (Exception ex) {
                             logger.error(ex);
                         }
