@@ -63,7 +63,7 @@ public class XMLOverviewTest {
 
         // create a new temporary file
         File newFile = TestHelper.copyToTemporary(temporaryFolder, originalFile,
-                "\"CopyOfNormalModeFile.xml\"");
+                "CopyOfNormalModeFile.xml");
 
         // the content of both the original and the new file should be the same
         try {
