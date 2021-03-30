@@ -22,14 +22,18 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.custommonkey.xmlunit.Diff;
 import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 
 import static org.junit.Assert.assertTrue;
@@ -58,18 +62,20 @@ public class XMLOverviewTest {
 
         File originalFile = TestHelper.getFile("/OverviewNormalMode.xml");
 
-        // get the overview from an existing test XML overview file
-        final XMLOverview xmlOverview = new XMLOverview(originalFile);
-
         // create a new temporary file
         File newFile = TestHelper.copyToTemporary(temporaryFolder, originalFile,
                 "CopyOfNormalModeFile.xml");
 
         // the content of both the original and the new file should be the same
         try {
-            assertTrue(FileUtils.contentEquals(originalFile, newFile));
+            //XMLUnit.setIgnoreWhitespace(true);
+            final Diff diff = new Diff(Files.readString(Paths.get(originalFile.getAbsolutePath())),
+                    Files.readString(Paths.get(newFile.getAbsolutePath())));
+            assertTrue(diff.identical());
         } catch (IOException e) {
             fail();
+            e.printStackTrace();
+        } catch (SAXException e) {
             e.printStackTrace();
         }
     }
