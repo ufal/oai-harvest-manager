@@ -11,6 +11,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <versionNumber>${project.version}.${buildNumber}</versionNumber>
+        <eclipse.persistence.version>2.7.8</eclipse.persistence.version>
     </properties>
 
     <scm>
@@ -65,25 +66,6 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-core</artifactId>
-            <version>2.7.0</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.10.10</version>
@@ -94,16 +76,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.8.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <!-- XXX this is the last version that has org.mockito.internal.util.reflection.FieldSetter
-                 StaticProviderTest depends on that -->
-            <version>3.4.6</version>
-            <scope>test</scope>
-        </dependency>
-  
 
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
@@ -137,10 +109,45 @@
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>2.3.3</version>
         </dependency>
+        <!-- jaxb implementation -->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.moxy</artifactId>
-            <version>2.7.8</version>
+            <version>${eclipse.persistence.version}</version>
+        </dependency>
+        <!-- things like @XmlClassExtractor -->
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.core</artifactId>
+            <version>${eclipse.persistence.version}</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-core</artifactId>
+            <version>2.7.0</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jaxb-api</artifactId>
+                    <groupId>javax.xml.bind</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <!-- XXX this is the last version that has org.mockito.internal.util.reflection.FieldSetter
+                 StaticProviderTest depends on that -->
+            <version>3.4.6</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
