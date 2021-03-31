@@ -99,30 +99,23 @@ public class ConfigurationTest {
     public void testProviders() throws Exception {
         final List<Provider> providers = getBasicConfig().getProviders();
         assertNotNull(providers);
-        assertEquals(4, providers.size());
+        assertEquals(3, providers.size());
         assertEquals("https://www.meertens.knaw.nl/flat/oai2", providers.get(0).getOaiUrl());
     }
 
     @Test
-    public void testOldStyleStaticProvider() throws Exception {
-        final List<Provider> providers = getBasicConfig().getProviders();
-        assertNotNull(providers);
-        assertEquals(4, providers.size());
-        assertTrue(providers.get(1) instanceof StaticProvider);
-    }
-    @Test
     public void testStaticProvider() throws Exception {
         final List<Provider> providers = getBasicConfig().getProviders();
         assertNotNull(providers);
-        assertEquals(4, providers.size());
-        assertTrue(providers.get(2) instanceof StaticProvider);
+        assertEquals(3, providers.size());
+        assertTrue(providers.get(1) instanceof StaticProvider);
     }
     @Test
     public void testBasicProviderSets() throws Exception{
         final List<Provider> providers = getBasicConfig().getProviders();
         assertNotNull(providers);
-        assertEquals(4, providers.size());
-        assertEquals(2, providers.get(3).getSets().length);
+        assertEquals(3, providers.size());
+        assertEquals(2, providers.get(2).getSets().length);
     }
 
     @Test

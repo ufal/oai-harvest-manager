@@ -30,7 +30,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
@@ -119,7 +118,7 @@ public class Configuration {
 
     {
         try {
-            jaxbContext = JAXBContext.newInstance(Provider.class, StaticProvider.class);
+            jaxbContext = JAXBContext.newInstance(new Class[]{Provider.class, StaticProvider.class}, Collections.emptyMap());
             unmarshaller = jaxbContext.createUnmarshaller();
         } catch (JAXBException e) {
             logger.error(e);
@@ -517,15 +516,7 @@ public class Configuration {
 
     private Provider readProvider(Node node){
         try {
-            boolean isStatic = Boolean.parseBoolean(Util.getNodeText(xpath, "./@static", node));
-            final Provider provider;
-            if (isStatic) {
-                JAXBElement<StaticProvider> je = unmarshaller.unmarshal(node, StaticProvider.class);
-                provider = je.getValue();
-                logger.warn("Using @static is deprecated; use xsi:type=\"staticProvider\" instead");
-            } else {
-                provider = (Provider) unmarshaller.unmarshal(node);
-            }
+            final Provider provider = (Provider) unmarshaller.unmarshal(node);
 
             // TODO this is odd way to provide defaults
             // default if not set
@@ -545,7 +536,7 @@ public class Configuration {
                 provider.setIncremental(isIncremental());
             }
             return provider;
-        }catch (XPathExpressionException | JAXBException e){
+        }catch (JAXBException e){
             logger.error(e);
             throw new RuntimeException(e);
         }

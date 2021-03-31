@@ -27,6 +27,7 @@ import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.metadata.NSContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.persistence.oxm.annotations.XmlClassExtractor;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -50,6 +51,7 @@ import java.util.Arrays;
  *
  * @author Lari Lampen (MPI-PL)
  */
+@XmlClassExtractor(ProviderExtractor.class)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 public class Provider {

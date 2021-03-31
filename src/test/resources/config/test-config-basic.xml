@@ -78,7 +78,6 @@
 -->
     <provider url="https://www.meertens.knaw.nl/flat/oai2?verb=Identify"/>
     <provider url="http://example.com" static="true"/>
-    <provider url="http://example.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="staticProvider"/>
     <provider url="https://example.edu">
             <set>first</set>
             <set>second</set>

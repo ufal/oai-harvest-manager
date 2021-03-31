@@ -22,22 +22,20 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.custommonkey.xmlunit.Diff;
 import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.DifferenceEvaluators;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Iterator;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * <br> Tests targeting the cycle package <br><br>
@@ -67,17 +65,13 @@ public class XMLOverviewTest {
                 "CopyOfNormalModeFile.xml");
 
         // the content of both the original and the new file should be the same
-        try {
-            //XMLUnit.setIgnoreWhitespace(true);
-            final Diff diff = new Diff(Files.readString(Paths.get(originalFile.getAbsolutePath())),
-                    Files.readString(Paths.get(newFile.getAbsolutePath())));
-            assertTrue(diff.identical());
-        } catch (IOException e) {
-            fail();
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        }
+        final Diff diff =
+                DiffBuilder.compare(originalFile).withTest(newFile).
+                        withDifferenceEvaluator(DifferenceEvaluators.ignorePrologDifferencesExceptDoctype())
+                        .ignoreWhitespace()
+                        .checkForIdentical()
+                        .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
