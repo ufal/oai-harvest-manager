@@ -310,7 +310,7 @@ public class Configuration {
                             logger.error("Invalid output directory " + outDirId
                                     + " specified for save action");
                         }
-                    } else if ("transform".equals(actionType)) {
+                    } else if (actionType != null && actionType.toLowerCase().contains("transform")) {
                         try {
                             String xslFile = Util.getNodeText(xpath, "./@file", actionNode);
                             Path cache = null;
@@ -331,9 +331,7 @@ public class Configuration {
                                     logger.error("@max-jobs[" + jobsStr + "] doesn't contain a valid number", e);
                                 }
                             }
-                            boolean staticParam = Boolean.valueOf(Util.getNodeText(xpath, "./@staticParam",
-                                    actionNode));
-                            if(staticParam){
+                            if("staticTransform".equals(actionType)){
                                 act = new StaticParamTransformAction(base, xslFile, cache, jobs);
                             }else {
                                 act = new TransformAction(base, xslFile, cache, jobs);
