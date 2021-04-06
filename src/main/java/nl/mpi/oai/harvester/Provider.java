@@ -133,7 +133,7 @@ public class Provider {
         setRetryDelays(retryDelays);
     }
 
-    public Provider() throws ParserConfigurationException {
+    Provider() throws ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         // note: the dbf might throw the checked ParserConfigurationException
         db = dbf.newDocumentBuilder();

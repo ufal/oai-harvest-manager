@@ -113,8 +113,8 @@ public class Configuration {
     
     private String mapFile = "map.csv";
 
-    JAXBContext jaxbContext;
-    Unmarshaller unmarshaller;
+    private final JAXBContext jaxbContext;
+    private final Unmarshaller unmarshaller;
 
     {
         try {

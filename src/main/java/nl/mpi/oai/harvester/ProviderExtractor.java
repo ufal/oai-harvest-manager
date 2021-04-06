@@ -8,7 +8,7 @@ public class ProviderExtractor extends ClassExtractor {
     @Override
     public Class extractClassFromRow(Record record, Session session) {
 
-        boolean isStatic = Boolean.valueOf((String)record.get("@static"));
+        boolean isStatic = Boolean.parseBoolean((String)record.get("@static"));
         if (isStatic) {
             return StaticProvider.class;
         }

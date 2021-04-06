@@ -69,7 +69,7 @@ public class StaticProvider extends Provider {
 	super(oaiUrl, maxRetryCount, retryDelays);
     }
 
-    public StaticProvider() throws ParserConfigurationException{
+    StaticProvider() throws ParserConfigurationException{
     	super();
 	}
 
