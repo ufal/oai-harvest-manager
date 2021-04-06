@@ -119,6 +119,18 @@ public class ConfigurationTest {
     }
 
     @Test
+    public void testBasicProviderDefaults() throws Exception {
+        final List<Provider> providers = getBasicConfig().getProviders();
+        Provider withDefaults = providers.get(0);
+        assertEquals("ListRecords", withDefaults.getScenario());
+        assertEquals(60, withDefaults.getTimeout());
+        assertFalse(withDefaults.getIncremental());
+        Provider overriddenDefaults = providers.get(2);
+        assertEquals("ListIdentifiers", overriddenDefaults.getScenario());
+        assertTrue(overriddenDefaults.getIncremental());
+    }
+
+    @Test
     public void testImportFromRegistry() throws Exception {
         //set up mock centre registry REST XML server
         final String registryURl = setUpMockRegistry();

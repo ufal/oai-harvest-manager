@@ -115,11 +115,25 @@ public class Configuration {
 
     private final JAXBContext jaxbContext;
     private final Unmarshaller unmarshaller;
+    private final Unmarshaller.Listener providerDefaults;
 
     {
         try {
             jaxbContext = JAXBContext.newInstance(new Class[]{Provider.class, StaticProvider.class}, Collections.emptyMap());
             unmarshaller = jaxbContext.createUnmarshaller();
+            providerDefaults = new Unmarshaller.Listener() {
+                @Override
+                public void beforeUnmarshal(Object target, Object parent) {
+                    if(target instanceof Provider) {
+                        Provider provider = (Provider) target;
+                        provider.setTimeout(getTimeout());
+                        provider.setMaxRetryCount(getMaxRetryCount());
+                        provider.setRetryDelays(getRetryDelays());
+                        provider.setScenario(getScenario());
+                        provider.setIncremental(isIncremental());
+                    }
+                }
+            };
         } catch (JAXBException e) {
             logger.error(e);
             throw new RuntimeException(e);
@@ -170,6 +184,7 @@ public class Configuration {
         parseActions((Node) xpath.evaluate("/config/actions",
                 doc.getDocumentElement(), XPathConstants.NODE));
 
+        unmarshaller.setListener(providerDefaults);
         logger.debug("Reading: providers");
         // Some provider names are fetched over the network, so a reasonable
         // timeout should be set here.
@@ -178,6 +193,7 @@ public class Configuration {
         // ----- Read list of providers -----
         parseProviders((Node) xpath.evaluate("/config/providers",
                 doc.getDocumentElement(), XPathConstants.NODE));
+        unmarshaller.setListener(null);
 
         // Apply configured timeout, overriding our temporary value.
         applyTimeoutSetting();
@@ -516,26 +532,7 @@ public class Configuration {
 
     private Provider readProvider(Node node){
         try {
-            final Provider provider = (Provider) unmarshaller.unmarshal(node);
-
-            // TODO this is odd way to provide defaults
-            // default if not set
-            if (provider.timeout == null) {
-                provider.setTimeout(getTimeout());
-            }
-            if (provider.maxRetryCount == null) {
-                provider.setMaxRetryCount(getMaxRetryCount());
-            }
-            if (provider.retryDelays == null) {
-                provider.setRetryDelays(getRetryDelays());
-            }
-            if (provider.scenario == null) {
-                provider.setScenario(getScenario());
-            }
-            if (provider.incremental == null) {
-                provider.setIncremental(isIncremental());
-            }
-            return provider;
+            return (Provider) unmarshaller.unmarshal(node);
         }catch (JAXBException e){
             logger.error(e);
             throw new RuntimeException(e);

@@ -78,7 +78,7 @@
 -->
     <provider url="https://www.meertens.knaw.nl/flat/oai2?verb=Identify"/>
     <provider url="http://example.com" static="true"/>
-    <provider url="https://example.edu">
+    <provider url="https://example.edu" scenario="ListIdentifiers" incremental="true">
             <set>first</set>
             <set>second</set>
     </provider>
