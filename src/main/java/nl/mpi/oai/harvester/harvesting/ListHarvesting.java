@@ -21,7 +21,6 @@ package nl.mpi.oai.harvester.harvesting;
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.control.FileSynchronization;
 import nl.mpi.oai.harvester.control.Main;
-import nl.mpi.oai.harvester.cycle.Endpoint;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;
@@ -61,7 +60,6 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
      * Messages specific to extending classes
      */
     final static String[] message = new String [3];
-    final Endpoint endpoint;
     /**
      * Associate endpoint data and desired prefix
      * 
@@ -71,15 +69,13 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
      * @param metadataFactory the metadata factory
      */
     ListHarvesting(OAIFactory oaiFactory, Provider provider,
-                   List<String> prefixes, MetadataFactory metadataFactory,
-                   Endpoint endpoint){
+                   List<String> prefixes, MetadataFactory metadataFactory){
 
         super(oaiFactory, provider, metadataFactory);
         this.prefixes   = prefixes;
         document        = null;
         resumptionToken = null;
         tIndex          = 0;
-        this.endpoint = endpoint;
 
         // check for protocol errors
         if (prefixes == null){
@@ -181,12 +177,16 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
         String untilDate = null;
 
 
-        if(provider.getIncremental() && endpoint != null) {
-            untilDate = formatter.format(new Date());
-            if (endpoint.getHarvestedDate() != null) {
-                fromDate = formatter.format(endpoint.getHarvestedDate().toDate());
-            }
+        // TODO XXX implement provider harvesting history
+/*
+        if(provider.shouldResume()){
+            resumptionToken = provider.getResumptionToken();
         }
+        else if(provider.getIncremental() && provider.getLastHarvestedDate() != null) {
+            untilDate = formatter.format(new Date());
+            fromDate = formatter.format(provider.getLastHarvestedDate());
+        }
+*/
 
         // number of requests attempted
         int i = 0;
@@ -203,6 +203,7 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
                 if (!(resumptionToken == null || resumptionToken.isEmpty())) {
                     // use resumption token
                     logger.debug(message[0] + prefixes.get(pIndex));
+                    logger.debug("The resumption token is \"" + resumptionToken + "\"");
 
                     document = verb2(provider.oaiUrl, resumptionToken, provider.getTimeout());
                 } else {

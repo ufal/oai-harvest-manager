@@ -20,7 +20,6 @@
 package nl.mpi.oai.harvester.harvesting;
 
 import nl.mpi.oai.harvester.Provider;
-import nl.mpi.oai.harvester.cycle.Endpoint;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;
@@ -72,9 +71,9 @@ public class IdentifierListHarvesting extends ListHarvesting
      */
     public IdentifierListHarvesting(OAIFactory oaiFactory,
                                     Provider provider, List<String> prefixes,
-                                    MetadataFactory metadataFactory, Endpoint endpoint){
+                                    MetadataFactory metadataFactory){
 
-        super(oaiFactory, provider, prefixes, metadataFactory, endpoint);
+        super(oaiFactory, provider, prefixes, metadataFactory);
         // supply the superclass with messages specific to requesting identifiers
         message [0] = "Requesting more identifiers of records with prefix ";
         message [1] = "Requesting identifiers of records with prefix ";

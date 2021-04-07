@@ -40,7 +40,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -94,7 +93,7 @@ public class Configuration {
         WORKDIR("workdir"), RETRYCOUNT("max-retry-count"),
         RETRYDELAY("retry-delay"), MAXJOBS("max-jobs"),
         POOLSIZE("resource-pool-size"), TIMEOUT("timeout"),
-        OVERVIEWFILE("overview-file"), MAPFILE("map-file"),
+        MAPFILE("map-file"),
         SAVERESPONSE("save-response"), SCENARIO("scenario"), INCREMENTAL("incremental"), DRYRUN("dry-run");
         private final String val;
 
@@ -605,26 +604,6 @@ public class Configuration {
         return Integer.valueOf(s);
     }
 
-    /**
-     * @return string indicating the location of the overview file
-     */
-    public String getOverviewFile() {
-        String o = settings.get(KnownOptions.OVERVIEWFILE.toString());
-        if (o == null)
-            o = "overview.xml";
-        Path p = Paths.get(o);
-        if (!Files.exists(p)) {
-            try {
-                String overview = "<overviewType/>";
-                BufferedWriter writer = Files.newBufferedWriter(p);
-                writer.write(overview, 0, overview.length());
-                writer.close();
-            } catch (IOException e) {
-                logger.error("couldn't create an initial/default " + o + " file: ", e);
-            }
-        }
-        return o;
-    }
 
     /**
      * @return string indicating the location of the map file

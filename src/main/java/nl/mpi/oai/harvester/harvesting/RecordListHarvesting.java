@@ -20,7 +20,6 @@
 package nl.mpi.oai.harvester.harvesting;
 
 import nl.mpi.oai.harvester.Provider;
-import nl.mpi.oai.harvester.cycle.Endpoint;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;
@@ -70,12 +69,11 @@ public class RecordListHarvesting extends ListHarvesting
      * @param provider the endpoint to address in the request
      * @param prefixes the prefixes returned by the endpoint
      * @param metadataFactory the metadata factory
-     * @param endpoint
      */
     public RecordListHarvesting(OAIFactory oaiFactory, Provider provider,
-                                List<String> prefixes, MetadataFactory metadataFactory, Endpoint endpoint) {
+                                List<String> prefixes, MetadataFactory metadataFactory) {
 
-        super (oaiFactory, provider, prefixes, metadataFactory, endpoint);
+        super (oaiFactory, provider, prefixes, metadataFactory);
         // supply the superclass with messages specific to requesting records
         message [0] = "Requesting more records with prefix ";
         message [1] = "Requesting records with prefix ";

@@ -159,7 +159,7 @@ public class ScenarioTest {
                 // create a record list harvesting object
                 RecordListHarvesting recordListHarvesting = new
                         RecordListHarvesting(oaiFactory, endpoint, prefixes,
-                        metadataFactory, null);
+                        metadataFactory);
 
                 // follow the record list harvesting scenario
                 scenario.listRecords(recordListHarvesting);
@@ -169,7 +169,7 @@ public class ScenarioTest {
                 // create a identifier list harvesting object
                 IdentifierListHarvesting identifierListHarvesting = new
                         IdentifierListHarvesting(oaiFactory, endpoint, prefixes,
-                        metadataFactory, null);
+                        metadataFactory);
 
                 // follow the identifier list harvesting scenario
                 scenario.listIdentifiers(identifierListHarvesting);

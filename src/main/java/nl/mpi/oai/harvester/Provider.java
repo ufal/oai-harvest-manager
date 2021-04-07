@@ -20,7 +20,6 @@ package nl.mpi.oai.harvester;
 
 import ORG.oclc.oai.harvester2.verb.Identify;
 import nl.mpi.oai.harvester.action.ActionSequence;
-import nl.mpi.oai.harvester.cycle.Endpoint;
 import nl.mpi.oai.harvester.harvesting.OAIFactory;
 import nl.mpi.oai.harvester.harvesting.Scenario;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
@@ -99,8 +98,6 @@ public class Provider {
 	 * Provider deletion mode
 	 */
 	public DeletionMode deletionMode;
-
-    private Endpoint endpoint;
 
     // factory for metadata records
     final MetadataFactory metadataFactory = new MetadataFactory();
@@ -391,14 +388,6 @@ public class Provider {
                 ", timeout=" + timeout +
                 ", exclusive=" + exclusive +
                 '}';
-    }
-
-    public void setEndpoint(Endpoint endpoint) {
-        this.endpoint = endpoint;
-    }
-
-    public Endpoint getEndpoint(){
-        return endpoint;
     }
 
 	public enum DeletionMode {

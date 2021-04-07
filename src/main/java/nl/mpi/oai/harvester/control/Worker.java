@@ -20,8 +20,6 @@ package nl.mpi.oai.harvester.control;
 
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.action.ActionSequence;
-import nl.mpi.oai.harvester.cycle.Cycle;
-import nl.mpi.oai.harvester.cycle.Endpoint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -51,28 +49,17 @@ class Worker implements Runnable {
     /** List of actionSequences to be applied to the harvested metadata. */
     private final List<ActionSequence> actionSequences;
 
-
-    // kj: annotate
-    final Endpoint endpoint;
-
     /**
      * Associate a provider and action actionSequences with a scenario
      *
      * @param provider OAI-PMH provider that this thread will harvest
-     * @param cycle the harvesting cycle
      */
-    public Worker(Provider provider,
-                  Cycle cycle) {
+    public Worker(Provider provider) {
 
 	this.provider = provider;
 
 	this.actionSequences = Main.config.getActionSequences();
 
-        // register the endpoint with the cycle, kj: get the group
-        endpoint = cycle.next(provider.getOaiUrl(), "group");
-
-        // FIXME The Endpoint should be refactored further
-        provider.setEndpoint(endpoint);
     }
 
     @Override
@@ -105,10 +92,12 @@ class Worker implements Runnable {
             }
 
             // report back success or failure to the cycle
-            endpoint.doneHarvesting(done);
+            //TODO XXX report back
+            //endpoint.doneHarvesting(done);
             if (provider.getIncremental()) {
                 FileSynchronization.saveStatistics(provider);
-                endpoint.setIncrement(FileSynchronization.getProviderStatistic(provider).getHarvestedRecords());
+                //TODO XXX  increment + stats
+                //endpoint.setIncrement(FileSynchronization.getProviderStatistic(provider).getHarvestedRecords());
             }
             logger.info("Processing finished for " + provider);
         } catch (Throwable e) {

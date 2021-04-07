@@ -21,7 +21,6 @@ package nl.mpi.oai.harvester.harvesting;
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.action.ActionSequence;
 import nl.mpi.oai.harvester.control.FileSynchronization;
-import nl.mpi.oai.harvester.control.Main;
 import nl.mpi.oai.harvester.metadata.Metadata;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
@@ -279,12 +278,12 @@ public class Scenario {
         if (method.equals("ListIdentifiers")) {
             // get the records indirectly, first obtaining identifiers
             done = listIdentifiers(new IdentifierListHarvesting(oaiFactory,
-                    provider, prefixes, metadataFactory, provider.getEndpoint()));
+                    provider, prefixes, metadataFactory));
             logger.debug("list identifiers -> done["+done+"]");
         } else {
             // get the records with ListRecords
             done = listRecords(new RecordListHarvesting(oaiFactory,
-                    provider, prefixes, metadataFactory, provider.getEndpoint()));
+                    provider, prefixes, metadataFactory));
             logger.debug("list records -> done[" + done + "]");
         }
         if(provider.getIncremental()) {

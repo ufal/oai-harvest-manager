@@ -18,16 +18,12 @@
 
 package nl.mpi.oai.harvester.control;
 
-import nl.mpi.oai.harvester.Provider;
-import nl.mpi.oai.harvester.cycle.Cycle;
-import nl.mpi.oai.harvester.cycle.CycleFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.*;
@@ -51,14 +47,8 @@ public class Main {
         
         ExecutorService executor = new ScheduledThreadPoolExecutor(config.getMaxJobs());
 
-	// create a CycleFactory
-	CycleFactory factory = new CycleFactory();
-	// get a cycle based on the overview file
-	File OverviewFile = new File (config.getOverviewFile());
-	Cycle cycle = factory.createCycle(OverviewFile);
-
 		final List<Callable<Object>> workers = config.getProviders().stream()
-				.map(provider -> new Worker(provider, cycle))
+				.map(Worker::new)
 				.map(Executors::callable)
 				.collect(Collectors.toList());
 		try {
