@@ -38,7 +38,7 @@
         <dir path="results/cmdi-1_1" id="cmdi-1_1" max-files="0"/>
         <dir path="results/cmdi" id="cmdi-1_2" max-files="0"/>
         <dir path="results/identity" id="ident" max-files="0"/>
-        <dir path="results/identity2" id="ident2" max-files="0"/>
+        <dir path="results/identity2" id="ident2" max-files="1"/>
     </directories>
 
 

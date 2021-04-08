@@ -50,18 +50,6 @@ public class OutputDirectory {
 
     /**
      * Create a new instance with the specified base directory path
-     * and no limit on the number of files on the top level of the
-     * directory.
-     * 
-     * @param base base path
-     * @throws IOException problem with the base path
-     */
-    public OutputDirectory(Path base) throws IOException {
-	this(base, 0);
-    }
-
-    /**
-     * Create a new instance with the specified base directory path
      * and given limit (maximum number of files within a
      * subdirectory). If limit=0, no limit is enforced.
      * 
