@@ -48,7 +48,7 @@
             <action type="split"/>
             <action type="save" dir="rec" suffix=".xml" history="true"/>
             <action type="strip"/>
-            <action type="save" dir="oai" suffix=".xml"/>
+            <action type="save" dir="oai" suffix=".xml" offload="true"/>
             <action type="staticTransform" file="http://localhost:8009/xslts/identity.xsl" max-jobs="6"/>
             <action type="save" dir="ident" suffix=".xml"/>
             <!-- max-jobs="1" to try forcing wait in resource pool -->
@@ -96,7 +96,7 @@
         <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws9">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws0">
+        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws0" exclusive="true">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
         <provider url="http://localhost:8009/oai-pmh/static-repo.xml" name="static_provider" static="true" />
