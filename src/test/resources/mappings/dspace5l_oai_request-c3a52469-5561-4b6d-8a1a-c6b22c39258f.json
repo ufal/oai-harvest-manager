@@ -1,0 +1,20 @@
+{
+  "id" : "c3a52469-5561-4b6d-8a1a-c6b22c39258f",
+  "name" : "dspace5l_oai_request",
+  "request" : {
+    "url" : "/dspace5l/oai/request?verb=GetRecord&identifier=oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-CESILKO&metadataPrefix=oai_dc",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet href='static/style.xsl' type='text/xsl'?><OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\"><responseDate>2021-04-08T13:17:04Z</responseDate><request verb=\"GetRecord\" identifier=\"oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-CESILKO\" metadataPrefix=\"oai_dc\">http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request</request><GetRecord><record><header><identifier>oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-CESILKO</identifier><datestamp>2020-02-19T13:38:56Z</datestamp><setSpec>hdl_11858_00-097C-0000-0001-486F-D</setSpec><setSpec>hdl_123456789_3198</setSpec><setSpec>hdl_11858_00-097C-0000-0023-8C33-2</setSpec></header><metadata><oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:doc=\"http://www.lyncode.com/xoai\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n<dc:title>Cesilko Web Service for Weblicht</dc:title>\n<dc:creator>Hajič, Jan</dc:creator>\n<dc:creator>Kuboň, Vladislav</dc:creator>\n<dc:creator>Homola, Petr</dc:creator>\n<dc:subject>machine translation</dc:subject>\n<dc:description>Weblicht integration of Cesilko (http://hdl.handle.net/11858/00-097C-0000-0006-AAFE-A)</dc:description>\n<dc:date>2014-05-06</dc:date>\n<dc:type>toolService</dc:type>\n<dc:identifier>http://hdl.handle.net/11234/5-CESILKO</dc:identifier>\n<dc:format>application/octet-stream</dc:format>\n<dc:format>application/octet-stream</dc:format>\n<dc:format>downloadable_files_count: 0</dc:format>\n<dc:publisher>Charles University, Faculty of Mathematics and Physics, Institute of Formal and Applied Linguistics (UFAL)</dc:publisher>\n</oai_dc:dc>\n</metadata></record></GetRecord></OAI-PMH>",
+    "headers" : {
+      "Server" : "nginx/1.14.0 (Ubuntu)",
+      "Date" : "Thu, 08 Apr 2021 13:17:04 GMT",
+      "Content-Type" : "application/xml;charset=UTF-8"
+    }
+  },
+  "uuid" : "c3a52469-5561-4b6d-8a1a-c6b22c39258f",
+  "persistent" : true,
+  "insertionIndex" : 8
+}

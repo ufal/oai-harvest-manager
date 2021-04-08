@@ -68,35 +68,35 @@
 
     <!-- ### list of providers ### -->
     <providers>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws1">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws1">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws2"
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws2"
                   scenario="ListIdentifiers">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws3">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws3">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws4">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws4">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws5">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws5">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws6">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws6">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws7">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws7">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws8">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws8">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws9">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws9">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws0" exclusive="true">
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="lindat_ws0" exclusive="true">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
         <provider url="http://localhost:8009/oai-pmh/static-repo.xml" name="static_provider" static="true" />

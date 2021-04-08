@@ -1,0 +1,20 @@
+{
+  "id" : "8bba935d-112d-4965-86ee-50bda66dc872",
+  "name" : "dspace5l_oai_request",
+  "request" : {
+    "url" : "/dspace5l/oai/request?verb=GetRecord&identifier=oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-UDPIPE-TAGGER&metadataPrefix=oai_dc",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet href='static/style.xsl' type='text/xsl'?><OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\"><responseDate>2021-04-08T13:17:05Z</responseDate><request verb=\"GetRecord\" identifier=\"oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-UDPIPE-TAGGER\" metadataPrefix=\"oai_dc\">http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request</request><GetRecord><record><header><identifier>oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-UDPIPE-TAGGER</identifier><datestamp>2020-02-19T13:38:56Z</datestamp><setSpec>hdl_11858_00-097C-0000-0001-486F-D</setSpec><setSpec>hdl_123456789_3198</setSpec><setSpec>hdl_11858_00-097C-0000-0023-8C33-2</setSpec></header><metadata><oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:doc=\"http://www.lyncode.com/xoai\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n<dc:title>UDPipe tagger Web Service for Weblicht</dc:title>\n<dc:creator>Straka, Milan</dc:creator>\n<dc:subject>udpipe</dc:subject>\n<dc:description>UDPipe is a trainable pipeline for tokenizing, tagging, lemmatizing and parsing Universal Treebanks and other CoNLL-U files (https://lindat.mff.cuni.cz/services/udpipe/)</dc:description>\n<dc:date>2016-02-08</dc:date>\n<dc:type>toolService</dc:type>\n<dc:identifier>http://hdl.handle.net/11234/5-UDPIPE-TAGGER</dc:identifier>\n<dc:format>application/octet-stream</dc:format>\n<dc:format>downloadable_files_count: 0</dc:format>\n<dc:publisher>Charles University, Faculty of Mathematics and Physics, Institute of Formal and Applied Linguistics (UFAL)</dc:publisher>\n<dc:source>http://hdl.handle.net/11234/5-UDPIPE-TAGGER</dc:source>\n</oai_dc:dc>\n</metadata></record></GetRecord></OAI-PMH>",
+    "headers" : {
+      "Server" : "nginx/1.14.0 (Ubuntu)",
+      "Date" : "Thu, 08 Apr 2021 13:17:05 GMT",
+      "Content-Type" : "application/xml;charset=UTF-8"
+    }
+  },
+  "uuid" : "8bba935d-112d-4965-86ee-50bda66dc872",
+  "persistent" : true,
+  "insertionIndex" : 10
+}

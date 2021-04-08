@@ -1,0 +1,20 @@
+{
+  "id" : "528c0419-b1e4-44b7-83c2-fd5278cb82f1",
+  "name" : "dspace5l_oai_request",
+  "request" : {
+    "url" : "/dspace5l/oai/request?verb=ListIdentifiers&set=hdl_11858_00-097C-0000-0023-8C33-2&metadataPrefix=oai_dc",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet href='static/style.xsl' type='text/xsl'?><OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\"><responseDate>2021-04-08T13:17:03Z</responseDate><request verb=\"ListIdentifiers\" metadataPrefix=\"oai_dc\" set=\"hdl_11858_00-097C-0000-0023-8C33-2\">http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request</request><ListIdentifiers><header><identifier>oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-CESILKO</identifier><datestamp>2020-02-19T13:38:56Z</datestamp><setSpec>hdl_11858_00-097C-0000-0001-486F-D</setSpec><setSpec>hdl_123456789_3198</setSpec><setSpec>hdl_11858_00-097C-0000-0023-8C33-2</setSpec></header><header><identifier>oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-UDPIPE-TOKENIZER</identifier><datestamp>2020-02-19T13:38:56Z</datestamp><setSpec>hdl_11858_00-097C-0000-0001-486F-D</setSpec><setSpec>hdl_123456789_3198</setSpec><setSpec>hdl_11858_00-097C-0000-0023-8C33-2</setSpec></header><header><identifier>oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-UDPIPE-TAGGER</identifier><datestamp>2020-02-19T13:38:56Z</datestamp><setSpec>hdl_11858_00-097C-0000-0001-486F-D</setSpec><setSpec>hdl_123456789_3198</setSpec><setSpec>hdl_11858_00-097C-0000-0023-8C33-2</setSpec></header><header><identifier>oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-UDPIPE-PARSER</identifier><datestamp>2020-02-19T13:38:57Z</datestamp><setSpec>hdl_11858_00-097C-0000-0001-486F-D</setSpec><setSpec>hdl_123456789_3198</setSpec><setSpec>hdl_11858_00-097C-0000-0023-8C33-2</setSpec></header><header><identifier>oai:ufal-point-dev.ufal.hide.ms.mff.cuni.cz:11234/5-UDPIPE-TOKENIZER+TAGGER</identifier><datestamp>2020-02-19T13:38:56Z</datestamp><setSpec>hdl_11858_00-097C-0000-0001-486F-D</setSpec><setSpec>hdl_123456789_3198</setSpec><setSpec>hdl_11858_00-097C-0000-0023-8C33-2</setSpec></header></ListIdentifiers></OAI-PMH>",
+    "headers" : {
+      "Server" : "nginx/1.14.0 (Ubuntu)",
+      "Date" : "Thu, 08 Apr 2021 13:17:03 GMT",
+      "Content-Type" : "application/xml;charset=UTF-8"
+    }
+  },
+  "uuid" : "528c0419-b1e4-44b7-83c2-fd5278cb82f1",
+  "persistent" : true,
+  "insertionIndex" : 6
+}

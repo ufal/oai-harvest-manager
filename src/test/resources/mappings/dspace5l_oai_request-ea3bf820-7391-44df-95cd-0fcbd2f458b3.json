@@ -1,0 +1,20 @@
+{
+  "id" : "ea3bf820-7391-44df-95cd-0fcbd2f458b3",
+  "name" : "dspace5l_oai_request",
+  "request" : {
+    "url" : "/dspace5l/oai/request?verb=Identify",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet href='static/style.xsl' type='text/xsl'?><OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\"><responseDate>2021-04-08T13:17:02Z</responseDate><request verb=\"Identify\">http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request</request><Identify><repositoryName>PŘÍLÍŠ ŽLUŤOUČKÝ KŮŇ ÚPĚL ĎÁBELSKÉ ÓDY</repositoryName><baseURL>http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request</baseURL><protocolVersion>2.0</protocolVersion><adminEmail>kosarko@ufal.mff.cuni.cz</adminEmail><earliestDatestamp>2006-06-21T00:00:00Z</earliestDatestamp><deletedRecord>transient</deletedRecord><granularity>YYYY-MM-DDThh:mm:ssZ</granularity><description>  <oai-identifier xmlns=\"http://www.openarchives.org/OAI/2.0/oai-identifier\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd\">\n      <scheme>oai</scheme>\n      <repositoryIdentifier>lindat.mff.cuni.cz </repositoryIdentifier>\n      <delimiter>:</delimiter>\n      <sampleIdentifier>oai:lindat.mff.cuni.cz:11858/00-097C-0000-0001-487A-4</sampleIdentifier>\n   </oai-identifier>\n</description><description><olac-archive xmlns=\"http://www.language-archives.org/OLAC/1.1/olac-archive\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" type=\"institutional\" currentAsOf=\"2021-03-19\" xsi:schemaLocation=\"http://www.language-archives.org/OLAC/1.1/olac-archive          http://www.language-archives.org/OLAC/1.1/olac-archive.xsd\">\n      <archiveURL>http://lindat.cz/</archiveURL>\n      <participant name=\"Jozef Misutka\" email=\"kosarko@ufal.mff.cuni.cz\" role=\"repository manager\" />\n      <institution>Institute of Formal and Applied Linguistics</institution>\n      <institutionURL>http://ufal.mff.cuni.cz</institutionURL>\n      <shortLocation>Prague, Czech Republic</shortLocation>\n      <location>Malostranské náměstí 25, 118 00 Praha, Czech Republic</location>\n      <synopsis>http://lindat.cz</synopsis>\n      <access>https://lindat.mff.cuni.cz/repository/xmlui/page/about</access>\n      <archivalSubmissionPolicy>https://lindat.mff.cuni.cz/repository/xmlui/page/about</archivalSubmissionPolicy>\n</olac-archive>\n</description></Identify></OAI-PMH>",
+    "headers" : {
+      "Server" : "nginx/1.14.0 (Ubuntu)",
+      "Date" : "Thu, 08 Apr 2021 13:17:02 GMT",
+      "Content-Type" : "application/xml;charset=UTF-8"
+    }
+  },
+  "uuid" : "ea3bf820-7391-44df-95cd-0fcbd2f458b3",
+  "persistent" : true,
+  "insertionIndex" : 4
+}

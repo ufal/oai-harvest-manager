@@ -2,6 +2,8 @@ package nl.mpi.oai.harvester;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.github.tomakehurst.wiremock.recording.SnapshotRecordResult;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import nl.mpi.oai.harvester.control.Main;
 import org.junit.*;
 
@@ -10,6 +12,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -32,19 +35,36 @@ public class MainIT {
         //set up mock www server;
         // to make the config search for identity.xsl easier
         stubFor(get(urlEqualTo("/xslts/identity.xsl"))
+                .atPriority(1)
                 .willReturn(identityXslResponse));
         // to provide a different transform action
         stubFor(get(urlEqualTo("/xslts/identity2.xsl"))
+                .atPriority(1)
                 .willReturn(identityXslResponse));
         // provide static repository
         stubFor(get(urlPathMatching("/oai-pmh/static-repo.xml"))
+                .atPriority(1)
                 .willReturn(aResponse().withBody(
                         Files.readString(
                                 Paths.get(
                                         getClass().getClassLoader().getResource("static-repo.xml").toURI()), StandardCharsets.ISO_8859_1)
                 )));
+//        startRecording(
+//            recordSpec()
+//                    .forTarget("http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/")
+//                    .onlyRequestsMatching(getRequestedFor(urlPathMatching("/dspace5l/.*")))
+//                    .allowNonProxied(true)
+//                    .ignoreRepeatRequests()
+//        );
 
     }
+
+//    @After
+//    public void tearDown(){
+//        final SnapshotRecordResult snapshotRecordResult = stopRecording();
+//        final List<StubMapping> stubMappings = snapshotRecordResult.getStubMappings();
+//        System.out.println(stubMappings);
+//    }
 
     @Test
     public void testIt() throws URISyntaxException {

@@ -1,0 +1,20 @@
+{
+  "id" : "e319568f-4252-4fb5-ba5f-18d35f8e5291",
+  "name" : "dspace5l_oai_request",
+  "request" : {
+    "url" : "/dspace5l/oai/request?verb=ListMetadataFormats",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet href='static/style.xsl' type='text/xsl'?><OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\"><responseDate>2021-04-08T13:17:03Z</responseDate><request verb=\"ListMetadataFormats\">http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request</request><ListMetadataFormats><metadataFormat><metadataPrefix>cmdi</metadataPrefix><schema>http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd</schema><metadataNamespace>http://www.clarin.eu/cmd/</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>elg</metadataPrefix><schema>http://w3id.org/meta-share/meta-share/ ../Schema/ELG-SHARE.xsd</schema><metadataNamespace>http://w3id.org/meta-share/meta-share/</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>mods</metadataPrefix><schema>http://www.loc.gov/standards/mods/v3/mods-3-1.xsd</schema><metadataNamespace>http://www.loc.gov/mods/v3</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>ore</metadataPrefix><schema>http://tweety.lanl.gov/public/schemas/2008-06/atom-tron.sch</schema><metadataNamespace>http://www.w3.org/2005/Atom</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>mets</metadataPrefix><schema>http://www.loc.gov/standards/mets/mets.xsd</schema><metadataNamespace>http://www.loc.gov/METS/</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>oai_dc</metadataPrefix><schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</schema><metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>dim</metadataPrefix><schema>http://www.dspace.org/schema/dim.xsd</schema><metadataNamespace>http://www.dspace.org/xmlns/dspace/dim</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>html</metadataPrefix><schema>http://lindat.mff.cuni.cz/schemas/experimental/html.xsd</schema><metadataNamespace>http://lindat.mff.cuni.cz/ns/experimental/html</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>oai_metasharev2</metadataPrefix><schema>http://metashare.ilsp.gr/META-XMLSchema/v2.0/META-SHARE-Resource.xsd</schema><metadataNamespace>http://www.ilsp.gr/META-XMLSchema</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>olac</metadataPrefix><schema>http://www.language-archives.org/OLAC/1.1/</schema><metadataNamespace>http://www.language-archives.org/OLAC/1.1/olac.xsd</metadataNamespace></metadataFormat><metadataFormat><metadataPrefix>bibtex</metadataPrefix><schema>http://lindat.mff.cuni.cz/schemas/experimental/bibtex.xsd</schema><metadataNamespace>http://lindat.mff.cuni.cz/ns/experimental/bibtex</metadataNamespace></metadataFormat></ListMetadataFormats></OAI-PMH>",
+    "headers" : {
+      "Server" : "nginx/1.14.0 (Ubuntu)",
+      "Date" : "Thu, 08 Apr 2021 13:17:03 GMT",
+      "Content-Type" : "application/xml;charset=UTF-8"
+    }
+  },
+  "uuid" : "e319568f-4252-4fb5-ba5f-18d35f8e5291",
+  "persistent" : true,
+  "insertionIndex" : 5
+}
