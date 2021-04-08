@@ -99,7 +99,6 @@ class Worker implements Runnable {
                 //TODO XXX  increment + stats
                 //endpoint.setIncrement(FileSynchronization.getProviderStatistic(provider).getHarvestedRecords());
             }
-            logger.info("Processing finished for " + provider);
         } catch (Throwable e) {
             logger.error("Processing failed for " + provider+": "+e.getMessage(),e);
             t = e;

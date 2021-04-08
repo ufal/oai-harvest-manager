@@ -102,7 +102,7 @@ public class StaticProviderTest {
 	Action[] actions = new Action[]{};
 	ActionSequence actionSequence = new ActionSequence(format, actions, 1);
 	Scenario scenario = new Scenario(instance, actionSequence);
-	Harvesting harvesting = spy(new StaticPrefixHarvesting(new OAIFactory(), instance, actionSequence));
+	FormatHarvesting harvesting = spy(new StaticPrefixHarvesting(new OAIFactory(), instance, actionSequence));
 	when(harvesting.request()).thenReturn(true);
 	when(harvesting.getResponse()).thenReturn(new DocumentSource(getClass().getResourceAsStream("/static-repo.xml")));
 	List<String> result = scenario.getPrefixes(harvesting);
@@ -200,7 +200,7 @@ public class StaticProviderTest {
 				new Action[]{action}, 1);
 
 		Scenario scenario = new Scenario(provider, actionSequence);
-		AbstractHarvesting harvesting = new StaticRecordListHarvesting(oaiFactory, provider, Arrays.asList(mdPrefix),
+		AbstractListHarvesting harvesting = new StaticRecordListHarvesting(oaiFactory, provider, Arrays.asList(mdPrefix),
 				new MetadataFactory());
 		boolean done = scenario.listIdentifiers(harvesting);
 		return  metadataRecords;

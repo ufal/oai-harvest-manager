@@ -6,6 +6,7 @@ import org.junit.*;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -22,13 +23,21 @@ public class MainIT {
 
     @Before
     public void setUp() throws Exception {
-        //set up mock www server; to make the config search for identity.xsl easier
+        //set up mock www server;
+        // to make the config search for identity.xsl easier
         stubFor(get(urlEqualTo("/xslts/identity.xsl"))
                 .willReturn(aResponse().withBody(
                                 Files.readString(
                                         Paths.get(
                                                 getClass().getClassLoader().getResource("identity.xsl").toURI()))
                         )));
+        // provide static repository
+        stubFor(get(urlPathMatching("/oai-pmh/static-repo.xml"))
+                .willReturn(aResponse().withBody(
+                        Files.readString(
+                                Paths.get(
+                                        getClass().getClassLoader().getResource("static-repo.xml").toURI()), StandardCharsets.ISO_8859_1)
+                )));
 
     }
 

@@ -63,7 +63,7 @@ public class Scenario {
      * @param harvesting harvester
      * @return false on parser or input output error
      */
-    public List<String> getPrefixes(Harvesting harvesting){
+    public List<String> getPrefixes(FormatHarvesting harvesting){
 
         //
         DocumentSource document;
@@ -109,7 +109,7 @@ public class Scenario {
      * @param harvesting harvester
      * @return false on parser or input output error
      */
-    public boolean listIdentifiers(AbstractHarvesting harvesting) {
+    public boolean listIdentifiers(AbstractListHarvesting harvesting) {
 
         DocumentSource identifiers;
 
@@ -199,7 +199,7 @@ public class Scenario {
      * @param harvesting harvester
      * @return false on parser or input output error
      */
-    public boolean listRecords(AbstractHarvesting harvesting) {
+    public boolean listRecords(AbstractListHarvesting harvesting) {
 
         DocumentSource records;
 
@@ -255,7 +255,7 @@ public class Scenario {
 
     public List<String> getMetadataFormats(OAIFactory oaiFactory){
         // set type of format harvesting to apply
-        AbstractHarvesting harvesting = new FormatHarvesting(oaiFactory,
+        FormatHarvesting harvesting = new FormatHarvesting(oaiFactory,
                 provider, actionSequence);
 
         // get the prefixes

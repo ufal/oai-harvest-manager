@@ -16,7 +16,7 @@
         <max-jobs>6</max-jobs>
 
         <!-- Number of resources placed in the resource pool. -->
-        <resource-pool-size>2</resource-pool-size>
+        <resource-pool-size>6</resource-pool-size>
 
         <overview-file>target/it/overview.xml</overview-file>
 
@@ -38,6 +38,7 @@
         <dir path="results/cmdi-1_1" id="cmdi-1_1" max-files="0"/>
         <dir path="results/cmdi" id="cmdi-1_2" max-files="0"/>
         <dir path="results/identity" id="ident" max-files="0"/>
+        <dir path="results/identity2" id="ident2" max-files="0"/>
     </directories>
 
 
@@ -45,10 +46,21 @@
     <actions>
         <format match="prefix" value="oai_dc">
             <action type="split"/>
-            <action type="save" dir="rec" suffix=".xml"/>
+            <action type="save" dir="rec" suffix=".xml" history="true"/>
             <action type="strip"/>
             <action type="save" dir="oai" suffix=".xml"/>
-            <action type="transform" file="http://localhost:8009/xslts/identity.xsl" max-jobs="1"/>
+            <action type="staticTransform" file="http://localhost:8009/xslts/identity.xsl" max-jobs="6"/>
+            <action type="save" dir="ident" suffix=".xml"/>
+            <action type="transform" file="http://localhost:8009/xslts/identity.xsl"/>
+            <action type="save" dir="ident2" suffix=".xml"/>
+        </format>
+        <!-- for static-repo.xml -->
+        <format match="prefix" value="olac">
+            <action type="split"/>
+            <action type="save" dir="rec" suffix=".xml" history="true"/>
+            <action type="strip"/>
+            <action type="save" dir="oai" suffix=".xml"/>
+            <action type="transform" file="http://localhost:8009/xslts/identity.xsl"/>
             <action type="save" dir="ident" suffix=".xml"/>
         </format>
     </actions>
@@ -58,7 +70,8 @@
         <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws1">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
-        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws2">
+        <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws2"
+                  scenario="ListIdentifiers">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
         <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws3">
@@ -85,5 +98,8 @@
         <provider url="http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/dspace5l/oai/request" name="lindat_ws0">
             <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
         </provider>
+        <provider url="http://localhost:8009/oai-pmh/static-repo.xml" name="static_provider" static="true" />
+        <!-- blank name and ListIdentifiers -->
+        <provider url="http://localhost:8009/oai-pmh/static-repo.xml" static="true" scenario="ListIdentifiers" />
     </providers>
 </config>

@@ -24,16 +24,11 @@ import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -183,30 +178,7 @@ public class RecordListHarvesting extends ListHarvesting
      */
     @Override
     public boolean processResponse(DocumentSource document){
-
-        // check for protocol error
-        if (document == null){
-            throw new HarvestingException();
-        }
-
-        // the response is in place
-        try {
-            /* Try to create a list of records from the response. On failure,
-               stop the work on the current prefix.
-             */
-            nodeList = (NodeList)provider.xpath.evaluate(
-                    "//*[parent::*[local-name()='ListRecords']]",
-                    document.getDocument(), XPathConstants.NODESET);
-            logger.debug("found ["+nodeList.getLength()+"] records in the ListRecords response");
-        } catch (XPathExpressionException e) {
-            // something went wrong when creating the list, try another prefix
-            logger.error(e.getMessage(), e);
-            logger.info("Cannot create list of " + prefixes.get(pIndex) +
-                    " records for endpoint " + provider.oaiUrl);
-            return false;
-        }
-
-        return true;
+        throw new UnsupportedOperationException("If you see this exception revert the commit that removed the code");
     }
 
     /**
@@ -217,91 +189,12 @@ public class RecordListHarvesting extends ListHarvesting
      * the header and record elements.
      *
      * Note: the method will skip records the endpoint has flagged as 'deleted'
-     * 
+     *
      * @return null if an error occurred, otherwise the next record in the list
      */
     @Override
     public Object parseResponse() {
-        
-        // check for protocol errors
-        if (nodeList == null){
-            throw new HarvestingException();
-        }
-        if (nIndex >= nodeList.getLength()) {
-            throw new HarvestingException();
-        }
-
-        /* The list of nodes is in place, and the index points to an element
-           in the list. Turn the next node into a document.
-         */
-        logger.debug("process ["+nIndex+"/"+nodeList.getLength()+"] record from the ListRecords response");
-        Node node = nodeList.item(nIndex).cloneNode(true);
-        nIndex++;
-        Document doc = provider.db.newDocument();
-        Node copy = doc.importNode(node, true);
-        doc.appendChild(copy);
-
-        // evaluate the document, find the identifier
-        Node idNode;
-        try {
-            idNode = (Node) provider.xpath.evaluate("//*[starts-with(local-name(),"
-                    + "'identifier') and parent::*[local-name()='header'"
-                    + "and not(@status='deleted')]]/text()",
-                    doc, XPathConstants.NODE);
-        } catch (XPathExpressionException e) {
-            // something went wrong parsing, try another record
-            logger.error(e.getMessage(), e);
-            logger.info("error parsing header, skipping record");
-            return null;
-        }
-
-        if (idNode == null) {
-            /* The OAI header does not contain an identifier or the record has
-               been marked as deleted. In any case: skip it.
-            */
-            return null;
-        }
-
-        // evaluate the document, find the Metadata record
-        Node dataNode;
-        try {
-            dataNode = (Node) provider.xpath.evaluate("//*[local-name()="
-                    + "'metadata'"
-                    + "and parent::*[local-name()='record']]/*[1]",
-                    doc, XPathConstants.NODE);
-        } catch (XPathExpressionException e) {
-            // something went wrong parsing, try another record
-            logger.error(e.getMessage(), e);
-            logger.info("cannot find Metadata, skipping record");
-            return null;
-        }
-
-        if (dataNode == null) {
-            // the node does not contain metadata
-            return null;
-        }
-        
-        // create a document to store the metadata in
-        dataNode = dataNode.cloneNode(true);
-        doc = provider.db.newDocument();
-        copy = doc.importNode(dataNode, true);
-        doc.appendChild(copy);
-
-        String id = idNode.getTextContent();
-        String prefix = prefixes.get(pIndex);
-        
-        // check if the record has already been released by trying to add it to
-        IdPrefix idPrefix = new IdPrefix (id, prefix);
-        if (targets.checkAndInsertSorted(idPrefix)){
-
-            /* Inserted the metadata in the targets table. Release the metadata
-               to the client by submitting the details to the metadata factory.
-             */
-            return metadataFactory.create(id, prefix, new DocumentSource(id,doc), provider, false, false);
-        } else {
-            // not inserted, the record has already been released to the client
-            return null;
-        }
+        throw new UnsupportedOperationException("If you see this exception revert the commit that removed the code");
     }
 
     /**response
@@ -318,12 +211,6 @@ public class RecordListHarvesting extends ListHarvesting
      */
     @Override
     public boolean fullyParsed() {
-
-        // check for protocol error
-        if (nodeList == null){
-            throw new HarvestingException();
-        }
-
-        return nIndex == nodeList.getLength();
+        throw new UnsupportedOperationException("If you see this exception revert the commit that removed the code");
     }
 }

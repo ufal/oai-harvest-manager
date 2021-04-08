@@ -17,7 +17,7 @@ public class StaticScenario extends Scenario {
 
     public List<String> getMetadataFormats(OAIFactory oaiFactory){
         // set type of format harvesting to apply
-        AbstractHarvesting harvesting = new StaticPrefixHarvesting(
+        FormatHarvesting harvesting = new StaticPrefixHarvesting(
                 oaiFactory,
                 (StaticProvider) provider,
                 actionSequence);
