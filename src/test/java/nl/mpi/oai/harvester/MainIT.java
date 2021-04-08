@@ -1,5 +1,6 @@
 package nl.mpi.oai.harvester;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import nl.mpi.oai.harvester.control.Main;
 import org.junit.*;
@@ -23,14 +24,18 @@ public class MainIT {
 
     @Before
     public void setUp() throws Exception {
+        final ResponseDefinitionBuilder identityXslResponse = aResponse().withBody(
+                Files.readString(
+                        Paths.get(
+                                getClass().getClassLoader().getResource("identity.xsl").toURI()))
+        );
         //set up mock www server;
         // to make the config search for identity.xsl easier
         stubFor(get(urlEqualTo("/xslts/identity.xsl"))
-                .willReturn(aResponse().withBody(
-                                Files.readString(
-                                        Paths.get(
-                                                getClass().getClassLoader().getResource("identity.xsl").toURI()))
-                        )));
+                .willReturn(identityXslResponse));
+        // to provide a different transform action
+        stubFor(get(urlEqualTo("/xslts/identity2.xsl"))
+                .willReturn(identityXslResponse));
         // provide static repository
         stubFor(get(urlPathMatching("/oai-pmh/static-repo.xml"))
                 .willReturn(aResponse().withBody(

@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class StaticParamTransformAction extends TransformAction {
@@ -64,12 +65,13 @@ public class StaticParamTransformAction extends TransformAction {
     // Transform actions differ if and only if the XSLT files differ.
     @Override
     public int hashCode() {
-        return xsltFile.hashCode();
+        return Objects.hash("static", xsltFile);
     }
+
     @Override
     public boolean equals(Object o) {
-        if (o instanceof TransformAction) {
-            TransformAction t = (TransformAction)o;
+        if (o instanceof StaticParamTransformAction) {
+            StaticParamTransformAction t = (StaticParamTransformAction) o;
             return xsltFile.equals(t.xsltFile);
         }
         return false;

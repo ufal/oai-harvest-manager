@@ -51,7 +51,8 @@
             <action type="save" dir="oai" suffix=".xml"/>
             <action type="staticTransform" file="http://localhost:8009/xslts/identity.xsl" max-jobs="6"/>
             <action type="save" dir="ident" suffix=".xml"/>
-            <action type="transform" file="http://localhost:8009/xslts/identity.xsl"/>
+            <!-- max-jobs="1" to try forcing wait in resource pool -->
+            <action type="transform" file="http://localhost:8009/xslts/identity2.xsl" max-jobs="1"/>
             <action type="save" dir="ident2" suffix=".xml"/>
         </format>
         <!-- for static-repo.xml -->
