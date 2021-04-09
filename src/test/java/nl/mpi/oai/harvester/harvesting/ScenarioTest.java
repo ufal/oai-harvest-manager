@@ -21,6 +21,8 @@ package nl.mpi.oai.harvester.harvesting;
 
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.action.ActionSequence;
+import nl.mpi.oai.harvester.harvesting.scenarios.Scenario;
+import nl.mpi.oai.harvester.harvesting.scenarios.ScenarioFactory;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -144,35 +146,19 @@ public class ScenarioTest {
         when(endpoint.getProviderName()).thenReturn("Language Bank of Finland");
 
         for (; ; ) {
-            // create a scenario with the endpoint and the mocked sequence
-            Scenario scenario = new Scenario(endpoint, sequence);
-
-            // create a harvesting object
-            FormatHarvesting formatHarvesting = new FormatHarvesting(oaiFactory,
-                    endpoint, sequence);
-
-            // follow the prefix list harvesting scenario
-            List<String> prefixes = scenario.getPrefixes(formatHarvesting);
-
             if (helper instanceof ListRecordsTestHelper) {
-
-                // create a record list harvesting object
-                RecordListHarvesting recordListHarvesting = new
-                        RecordListHarvesting(oaiFactory, endpoint, prefixes,
-                        metadataFactory);
-
+                endpoint.setScenario("ListRecords");
+                // create a scenario with the endpoint and the mocked sequence
+                Scenario scenario = ScenarioFactory.getScenario(endpoint, sequence);
                 // follow the record list harvesting scenario
-                scenario.listRecords(recordListHarvesting);
+                scenario.getRecords(oaiFactory, metadataFactory);
 
             } else {
-
-                // create a identifier list harvesting object
-                IdentifierListHarvesting identifierListHarvesting = new
-                        IdentifierListHarvesting(oaiFactory, endpoint, prefixes,
-                        metadataFactory);
-
+                endpoint.setScenario("ListIdentifiers");
+                // create a scenario with the endpoint and the mocked sequence
+                Scenario scenario = ScenarioFactory.getScenario(endpoint, sequence);
                 // follow the identifier list harvesting scenario
-                scenario.listIdentifiers(identifierListHarvesting);
+                scenario.getRecords(oaiFactory, metadataFactory);
             }
 
             // switch to the next endpoint

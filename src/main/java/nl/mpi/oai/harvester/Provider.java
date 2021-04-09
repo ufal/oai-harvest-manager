@@ -21,7 +21,8 @@ package nl.mpi.oai.harvester;
 import ORG.oclc.oai.harvester2.verb.Identify;
 import nl.mpi.oai.harvester.action.ActionSequence;
 import nl.mpi.oai.harvester.harvesting.OAIFactory;
-import nl.mpi.oai.harvester.harvesting.Scenario;
+import nl.mpi.oai.harvester.harvesting.scenarios.Scenario;
+import nl.mpi.oai.harvester.harvesting.scenarios.ScenarioFactory;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.metadata.NSContext;
 import org.apache.logging.log4j.LogManager;
@@ -303,11 +304,10 @@ public class Provider {
     }
 
     public boolean harvest(ActionSequence actionSequence){
-        logger.debug("dynamic harvest["+this+"]");
+        logger.debug(String.format("Harvesting [%s]", this));
 
-        Scenario s = new Scenario(this, actionSequence);
-        String method = getScenario();
-        return s.getRecords(method, oaiFactory, metadataFactory);
+        Scenario s = ScenarioFactory.getScenario(this, actionSequence);
+        return s.getRecords(oaiFactory, metadataFactory);
     }
 
     @XmlAttribute

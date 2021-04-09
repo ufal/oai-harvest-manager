@@ -20,8 +20,6 @@ package nl.mpi.oai.harvester;
 
 import ORG.oclc.oai.harvester2.verb.HarvesterVerb;
 import ORG.oclc.oai.harvester2.verb.Identify;
-import nl.mpi.oai.harvester.action.ActionSequence;
-import nl.mpi.oai.harvester.harvesting.StaticScenario;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -158,16 +156,6 @@ public class StaticProvider extends Provider {
 	    }
 	}
     }
-
-    @Override
-	public boolean harvest(ActionSequence actionSequence){
-		logger.debug("static harvest["+this+"]");
-
-		StaticScenario s = new StaticScenario(this, actionSequence);
-		String method = getScenario();
-		return s.getRecords(method, oaiFactory, metadataFactory);
-
-	}
 
     @Override
     public String toString() {

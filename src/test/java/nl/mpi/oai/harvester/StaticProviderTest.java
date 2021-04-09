@@ -33,6 +33,8 @@ import ORG.oclc.oai.harvester2.verb.Identify;
 import nl.mpi.oai.harvester.action.Action;
 import nl.mpi.oai.harvester.action.ActionSequence;
 import nl.mpi.oai.harvester.harvesting.*;
+import nl.mpi.oai.harvester.harvesting.scenarios.Scenario;
+import nl.mpi.oai.harvester.harvesting.scenarios.ScenarioFactory;
 import nl.mpi.oai.harvester.metadata.Metadata;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.metadata.MetadataFormat;
@@ -101,7 +103,7 @@ public class StaticProviderTest {
 		"http://www.language-archives.org/OLAC/1.0/");
 	Action[] actions = new Action[]{};
 	ActionSequence actionSequence = new ActionSequence(format, actions, 1);
-	Scenario scenario = new Scenario(instance, actionSequence);
+	Scenario scenario = ScenarioFactory.getScenario(instance, actionSequence);
 	FormatHarvesting harvesting = spy(new StaticPrefixHarvesting(new OAIFactory(), instance, actionSequence));
 	when(harvesting.request()).thenReturn(true);
 	when(harvesting.getResponse()).thenReturn(new DocumentSource(getClass().getResourceAsStream("/static-repo.xml")));
@@ -199,10 +201,9 @@ public class StaticProviderTest {
 		ActionSequence actionSequence = new ActionSequence(new MetadataFormat("prefix", mdPrefix),
 				new Action[]{action}, 1);
 
-		Scenario scenario = new Scenario(provider, actionSequence);
-		AbstractListHarvesting harvesting = new StaticRecordListHarvesting(oaiFactory, provider, Arrays.asList(mdPrefix),
-				new MetadataFactory());
-		boolean done = scenario.listIdentifiers(harvesting);
+		provider.setScenario("ListIdentifiers"); // This is here to remain compatible with previous implementation
+		Scenario scenario = ScenarioFactory.getScenario(provider, actionSequence);
+		boolean done = scenario.getRecords(oaiFactory, new MetadataFactory());
 		return  metadataRecords;
 	}
 
