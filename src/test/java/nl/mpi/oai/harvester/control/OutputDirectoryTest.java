@@ -5,8 +5,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,14 +23,6 @@ public class OutputDirectoryTest {
         final List<Path> dirs = Files.list(tmp).collect(Collectors.toList());
         assertEquals(2, dirs.size());
         assertTrue(Files.isDirectory(dirs.get(0)));
-        Files.walk(tmp)
-                .sorted(Comparator.reverseOrder())
-                .forEach(path -> {
-                    try {
-                        Files.delete(path);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+        nl.mpi.Utilities.deleteRecursive(tmp);
     }
 }
