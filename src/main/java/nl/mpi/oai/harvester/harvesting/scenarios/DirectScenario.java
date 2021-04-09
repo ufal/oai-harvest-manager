@@ -89,14 +89,17 @@ public class DirectScenario extends Scenario {
     }
 
 
+
     @Override
-    boolean doGetRecords(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory) {
-        return doGetRecords(new RecordListHarvesting(oaiFactory,
-                provider, prefixes, metadataFactory));
+    AbstractListHarvesting createHarvesting(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory) {
+        logger.debug("DirectScenario.createHarvesting3");
+        return new RecordListHarvesting(oaiFactory,
+                provider, prefixes, metadataFactory);
     }
 
     @Override
     boolean doGetRecords(AbstractListHarvesting harvesting){
+        logger.debug("DirectScenario.doGetRecords1");
         // get the records with ListRecords
         boolean done = listRecords(harvesting);
         logger.debug("list records -> done[" + done + "]");

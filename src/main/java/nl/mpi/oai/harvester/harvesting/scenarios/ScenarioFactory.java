@@ -15,6 +15,9 @@ public class ScenarioFactory {
         if(provider instanceof StaticProvider){
             scenario = new StaticScenario(scenario);
         }
+        if(provider.shouldResume()){
+            scenario = new ResumeScenario(scenario);
+        }
         return scenario;
 
     }

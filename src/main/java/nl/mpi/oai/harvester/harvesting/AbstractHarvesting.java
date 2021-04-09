@@ -114,4 +114,36 @@ public abstract class AbstractHarvesting implements Harvesting {
     public MetadataFactory getMetadataFactory() {
         return this.metadataFactory;
     }
+
+    /**
+     * Should be only called right after creation to continue an earlier harvest
+     * @param pIndex
+     */
+    public void setpIndex(int pIndex){
+        this.pIndex = pIndex;
+    }
+
+    /**
+     * Should be only called right after creation to continue an earlier harvest
+     * @param sIndex
+     */
+    public void setsIndex(int sIndex){
+        this.sIndex = sIndex;
+    }
+
+    /**
+     * Should be only called right after creation to continue an earlier harvest
+     * @param prefixes
+     */
+    public void setPrefixes(List<String> prefixes) {
+        this.prefixes = prefixes;
+    }
+
+    /**
+     * Should be only called right after creation to continue an earlier harvest
+     * @param resumptionToken
+     */
+    public void setResumptionToken(String resumptionToken) {
+        this.resumptionToken = resumptionToken;
+    }
 }

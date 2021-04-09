@@ -88,7 +88,10 @@ class Worker implements Runnable {
                     done = provider.harvest(actionSequence);
                 }
                 // break after any (the first) action sequence has completed successfully
-                if (done) break;
+                if (done){
+                    provider.cleanupResumptionDetails();
+                    break;
+                }
             }
 
             // report back success or failure to the cycle

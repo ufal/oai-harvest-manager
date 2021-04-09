@@ -35,14 +35,15 @@ public class StaticScenario extends Scenario {
     }
 
     @Override
-    boolean doGetRecords(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory) {
-        StaticRecordListHarvesting harvesting = new StaticRecordListHarvesting(oaiFactory,
+    AbstractListHarvesting createHarvesting(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory) {
+        logger.debug("StaticScenario.createHarvesting3");
+        return new StaticRecordListHarvesting(oaiFactory,
                 (StaticProvider) provider, prefixes, metadataFactory);
-        return doGetRecords(harvesting);
     }
 
     @Override
     boolean doGetRecords(AbstractListHarvesting harvesting){
+        logger.debug("StaticScenario.doGetRecords1");
         return scenario.doGetRecords(harvesting);
     }
 }

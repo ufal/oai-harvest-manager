@@ -105,13 +105,15 @@ public class IndirectScenario extends Scenario {
     }
 
     @Override
-    boolean doGetRecords(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory) {
-        return doGetRecords(new IdentifierListHarvesting(oaiFactory,
-                provider, prefixes, metadataFactory));
+    AbstractListHarvesting createHarvesting(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory) {
+        logger.debug("IndirectScenario.createHarvesting3");
+        return new IdentifierListHarvesting(oaiFactory,
+                provider, prefixes, metadataFactory);
     }
 
     @Override
     boolean doGetRecords(AbstractListHarvesting harvesting){
+        logger.debug("IndirectScenario.doGetRecords1");
         // get the records indirectly, first obtaining identifiers
         boolean done = listIdentifiers(harvesting);
         logger.debug("list identifiers -> done["+done+"]");

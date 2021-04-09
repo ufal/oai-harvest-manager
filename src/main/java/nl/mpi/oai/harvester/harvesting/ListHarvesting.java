@@ -272,6 +272,17 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
                                 + " records in set " + provider.sets[sIndex]
                                 + " from endpoint " + provider.oaiUrl + " after " + i + " tries!");
                     }
+                    // We might have harvested only 80k records out of 200k; then some network error caused retries
+                    // and a failure. Don't need to start from scratch if we can keep the resumptionToken
+                    if(resumptionToken != null){
+                        final Provider.ResumeDetails r = new Provider.ResumeDetails();
+                        r.resumptionToken = resumptionToken;
+                        r.pIndex = pIndex;
+                        r.sIndex = sIndex;
+                        r.prefixes = prefixes;
+                        provider.persistResumptionDetails(r);
+                    }
+
                     // do not retry any more, try another prefix instead
                     return false;
                 }

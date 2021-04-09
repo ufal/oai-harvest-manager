@@ -124,7 +124,8 @@ public abstract class Scenario {
             return false;
         }
 
-        boolean done = doGetRecords(prefixes, oaiFactory, metadataFactory);
+        AbstractListHarvesting harvesting = createHarvesting(prefixes, oaiFactory, metadataFactory);
+        boolean done = doGetRecords(harvesting);
 
         if(provider.getIncremental()) {
             FileSynchronization.execute(provider);
@@ -133,7 +134,7 @@ public abstract class Scenario {
 
     }
 
-    abstract boolean doGetRecords(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory);
+    abstract AbstractListHarvesting createHarvesting(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory);
     abstract boolean doGetRecords(AbstractListHarvesting harvesting);
 }
 

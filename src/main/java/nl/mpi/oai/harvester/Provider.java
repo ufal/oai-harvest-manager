@@ -20,6 +20,8 @@ package nl.mpi.oai.harvester;
 
 import ORG.oclc.oai.harvester2.verb.Identify;
 import nl.mpi.oai.harvester.action.ActionSequence;
+import nl.mpi.oai.harvester.control.Main;
+import nl.mpi.oai.harvester.control.Util;
 import nl.mpi.oai.harvester.harvesting.OAIFactory;
 import nl.mpi.oai.harvester.harvesting.scenarios.Scenario;
 import nl.mpi.oai.harvester.harvesting.scenarios.ScenarioFactory;
@@ -32,6 +34,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,9 +45,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class represents a single OAI-PMH provider.
@@ -105,6 +112,7 @@ public class Provider {
 
     // factory for OAI verbs
     final OAIFactory oaiFactory = new OAIFactory();
+    private ResumeDetails resumeDetails;
 
 
     /**
@@ -151,7 +159,6 @@ public class Provider {
         } catch (IOException ex) {
             temp = null;
         }
-
     }
 
     /**
@@ -160,6 +167,7 @@ public class Provider {
     public void init() {
 		if (name == null) fetchName();
 		if(deletionMode == null) fetchDeletionMode();
+		this.resumeDetails = loadResumeDetails();
     }
 
     public void close() {
@@ -375,6 +383,14 @@ public class Provider {
         return this.exclusive;
     }
 
+    public ResumeDetails getResumeDetails(){
+        return resumeDetails;
+    }
+
+    public boolean shouldResume(){
+        return getResumeDetails() != null;
+    }
+
     @Override
     public String toString() {
         return "Provider{" +
@@ -390,7 +406,59 @@ public class Provider {
                 '}';
     }
 
-	public enum DeletionMode {
+    public void persistResumptionDetails(ResumeDetails resumeDetails) {
+        try {
+            final Path file = getResumeTokensPath();
+            Files.createDirectories(file.getParent());
+            StringWriter sw = new StringWriter();
+            JAXB.marshal(resumeDetails, sw);
+            Files.writeString(file, sw.toString());
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
+    private ResumeDetails loadResumeDetails(){
+        if(Main.config != null){
+            final Path tokensPath = getResumeTokensPath();
+            if(Files.exists(tokensPath)){
+                final StringReader details;
+                try {
+                    details = new StringReader(Files.readString(tokensPath));
+                    logger.info("Loaded resumption details from " + tokensPath);
+                    return JAXB.unmarshal(details, ResumeDetails.class);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
+        }
+        return null;
+    }
+
+    private Path getResumeTokensPath(){
+        return Paths.get(Main.config.getWorkingDirectory(), "tokens", Util.toFileFormat(this.getName()));
+    }
+
+    public void cleanupResumptionDetails() {
+        this.resumeDetails = null;
+        try {
+            Files.deleteIfExists(getResumeTokensPath());
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
+
+    public enum DeletionMode {
 		NO, PERSISTENT, TRANSIENT
 	}
+
+	@XmlRootElement
+    public static class ResumeDetails{
+        public String resumptionToken;
+        public int pIndex;
+        public int sIndex;
+        public List<String> prefixes;
+
+    }
 }
