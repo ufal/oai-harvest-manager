@@ -62,8 +62,16 @@ public class WorkerIT {
         t.join();
         final Path oaiDcResults = Paths.get(workspace, "oai-pmh/worker_test");
         assertEquals("oai_dc wasn't supposed to be harvested; error on cmdi should have stopped that",
-                0, Files.list(oaiDcResults).count());
+                0, countFilesInDir(oaiDcResults));
 
 
+    }
+
+    private long countFilesInDir(Path path) throws IOException {
+        if(Files.exists(path)){
+            return Files.list(path).count();
+        }else{
+            return 0L;
+        }
     }
 }
