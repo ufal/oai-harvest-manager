@@ -18,15 +18,24 @@
 
 package nl.mpi.oai.harvester;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import nl.mpi.oai.harvester.action.ActionSequence;
+import nl.mpi.oai.harvester.harvesting.NoMoreRetriesException;
+import nl.mpi.oai.harvester.harvesting.OAIFactory;
+import nl.mpi.oai.harvester.harvesting.scenarios.Scenario;
+import nl.mpi.oai.harvester.harvesting.scenarios.ScenarioFactory;
 import nl.mpi.oai.harvester.metadata.MetadataFormat;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.w3c.dom.Document;
 
 /**
@@ -53,4 +62,18 @@ public class ProviderTest {
 
 	assertEquals(expResult, result);
     }
+
+    @Test(expected = NoMoreRetriesException.class)
+	public void exceptionThrownWhenNoMoreRetries() throws ParserConfigurationException {
+        Provider p = new Provider("bogus", 1, new int[] {});
+		ActionSequence as = new ActionSequence(new MetadataFormat("prefix", "oai_dc"));
+		Scenario mockedScenario = spy(ScenarioFactory.getScenario(p, as));
+		doReturn(List.of("oai_dc")).when(mockedScenario).getMetadataFormats(any(OAIFactory.class));
+		try(MockedStatic<ScenarioFactory> mockedFactory = Mockito.mockStatic(ScenarioFactory.class)){
+			mockedFactory.when(() -> ScenarioFactory.getScenario(any(Provider.class), any(ActionSequence.class)))
+					.thenReturn(mockedScenario);
+			p.harvest(as);
+		}
+
+	}
 }

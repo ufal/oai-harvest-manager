@@ -122,7 +122,7 @@ public class FormatHarvesting extends AbstractHarvesting implements
                     // something went wrong, ending the work for the current endpoint
                     logger.info ("Cannot obtain metadata formats from endpoint " +
                             provider.getOaiUrl());
-                    return false;
+                    throw new NoMoreRetriesException(String.format("Failed to harvest %s in %s tries due to errors", provider.oaiUrl, i));
                 } else {
                     int retryDelay = provider.getRetryDelay(i-1);
                     if (retryDelay > 0) {

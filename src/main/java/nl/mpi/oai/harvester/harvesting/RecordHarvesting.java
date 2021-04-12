@@ -104,8 +104,8 @@ public final class RecordHarvesting extends AbstractHarvesting {
                 logger.info("Cannot get " + prefix + " record with id " + identifier
                         + " from endpoint " + provider.oaiUrl);
                 if (i == provider.maxRetryCount) {
-                    // try another record
-                    return false;
+                    // try another record ???
+                    throw new NoMoreRetriesException(String.format("Failed to harvest %s in %s tries due to errors", provider.oaiUrl, i));
                 } else {
                     int retryDelay = provider.getRetryDelay(i-1);
                     if (retryDelay > 0) {
