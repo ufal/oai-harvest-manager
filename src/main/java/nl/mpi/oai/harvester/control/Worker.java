@@ -27,7 +27,6 @@ import org.apache.logging.log4j.ThreadContext;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -48,6 +47,8 @@ class Worker implements Runnable {
 
     /** List of actionSequences to be applied to the harvested metadata. */
     private final List<ActionSequence> actionSequences;
+    private final boolean isDryRun;
+    private final Configuration config;
 
     /**
      * Associate a provider and action actionSequences with a scenario
@@ -55,11 +56,14 @@ class Worker implements Runnable {
      * @param provider OAI-PMH provider that this thread will harvest
      */
     public Worker(Provider provider) {
+        this(provider, Main.config);
+    }
 
-	this.provider = provider;
-
-	this.actionSequences = Main.config.getActionSequences();
-
+    public Worker(Provider provider, Configuration config){
+        this.provider = provider;
+        this.actionSequences = config.getActionSequences();
+        this.isDryRun = config.isDryRun();
+        this.config = config;
     }
 
     @Override
@@ -82,7 +86,7 @@ class Worker implements Runnable {
 
             for (final ActionSequence actionSequence : actionSequences) {
                 
-                if(Main.config.isDryRun()) {
+                if(isDryRun) {
                     logger.info("Dry run mode. Skipping action sequence: {{}}", actionSequence.toString());
                 } else {
                     done = provider.harvest(actionSequence);
@@ -121,17 +125,19 @@ class Worker implements Runnable {
         }
     }
 
-    private static synchronized void writeProviderToMapFile(Provider provider) {
-        String map = Main.config.getMapFile();
-        try(PrintWriter m = new PrintWriter(new FileWriter(map,true))) {
-            if (Main.config.hasRegistryReader()) {
-                m.println(Main.config.getRegistryReader().endpointMapping(provider.getOaiUrl(),provider.getName()));
-            } else {
-                m.printf("%s,%s,,", provider.getOaiUrl(),Util.toFileFormat(provider.getName()).replaceAll("/", ""));
-                m.println();
+    private void writeProviderToMapFile(Provider provider) {
+        synchronized (config) {
+            String map = config.getMapFile();
+            try (PrintWriter m = new PrintWriter(new FileWriter(map, true))) {
+                if (config.hasRegistryReader()) {
+                    m.println(config.getRegistryReader().endpointMapping(provider.getOaiUrl(), provider.getName()));
+                } else {
+                    m.printf("%s,%s,,", provider.getOaiUrl(), Util.toFileFormat(provider.getName()).replaceAll("/", ""));
+                    m.println();
+                }
+            } catch (IOException e) {
+                logger.error("failed to write to the map file!", e);
             }
-        } catch (IOException e) {
-            logger.error("failed to write to the map file!",e);
         }
     }
 

@@ -12,7 +12,6 @@ import javax.xml.bind.JAXB;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,7 +79,7 @@ public class MainIT {
 
     @Test
     public void testIt() throws URISyntaxException {
-        final String configOnDisk = getConfig("config/test-config-it.xml");
+        final String configOnDisk = Utilities.getConfig("config/test-config-it.xml");
         Main.main(new String[] {configOnDisk});
     }
 
@@ -88,7 +87,7 @@ public class MainIT {
     public void errorTokenSaved() throws URISyntaxException, IOException {
         final Path tokenPath = Paths.get("target/it/workspace2/tokens/fake_resume");
         Files.deleteIfExists(tokenPath);
-        final String configOnDisk = getConfig("config/test-resume-with-token.xml");
+        final String configOnDisk = Utilities.getConfig("config/test-resume-with-token.xml");
         Main.main(new String[]{configOnDisk});
         //there's 503 simulating an issue
         final StringReader reader = new StringReader(Files.readString(tokenPath));
@@ -103,7 +102,7 @@ public class MainIT {
         Path tokenPath = prepareResumeTest(workspace, "fake_resume");
         Path tokenPath2 = prepareResumeTest(workspace, "fake_resume2");
 
-        final String configOnDisk = getConfig("config/test-resume-with-token.xml");
+        final String configOnDisk = Utilities.getConfig("config/test-resume-with-token.xml");
         // the harvest should start with the resumption token
         Main.main(new String[]{configOnDisk});
         //test this exists and is the only file
@@ -136,11 +135,6 @@ public class MainIT {
         details.sIndex = 0;
         JAXB.marshal(details, tokenPath.toFile());
         return tokenPath;
-    }
-
-    private String getConfig(String configResource) throws URISyntaxException {
-        final URL resourceURL = getClass().getClassLoader().getResource(configResource);
-        return Paths.get(resourceURL.toURI()).toAbsolutePath().toString();
     }
 
     @After
