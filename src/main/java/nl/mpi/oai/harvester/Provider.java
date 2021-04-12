@@ -353,9 +353,6 @@ public class Provider {
 
     @XmlAttribute
     public void setMaxRetryCount(int maxRetryCount) {
-        if(maxRetryCount < 1){
-            throw  new IllegalArgumentException("maxRetryCount must be at least 1");
-        }
         this.maxRetryCount = maxRetryCount;
     }
     
