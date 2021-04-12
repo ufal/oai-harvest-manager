@@ -59,6 +59,7 @@ public interface Harvesting {
      * request and stores for further processing
      *
      * @return  false if there was an error, true otherwise
+     * @throws NoMoreRetriesException
      */
     boolean request ();
 

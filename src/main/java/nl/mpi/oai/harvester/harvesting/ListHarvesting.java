@@ -283,8 +283,8 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
                         provider.persistResumptionDetails(r);
                     }
 
-                    // do not retry any more, try another prefix instead
-                    return false;
+                    // do not retry any more
+                    throw new NoMoreRetriesException(String.format("Failed to harvest %s in %s tries due to errors", provider.oaiUrl, i));
                 }
                 // retry the request once more
                 int retryDelay = provider.getRetryDelay(i-1);
