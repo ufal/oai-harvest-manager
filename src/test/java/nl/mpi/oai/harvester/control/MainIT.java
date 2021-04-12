@@ -1,15 +1,14 @@
-package nl.mpi.oai.harvester;
+package nl.mpi.oai.harvester.control;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import com.github.tomakehurst.wiremock.recording.SnapshotRecordResult;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import nl.mpi.Utilities;
-import nl.mpi.oai.harvester.control.Main;
+import nl.mpi.oai.harvester.Provider;
 import org.junit.*;
 
 import javax.xml.bind.JAXB;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
@@ -100,36 +99,52 @@ public class MainIT {
     @Test
     public void resumeWhenThereIsATokenSaved() throws IOException, URISyntaxException {
         final String workspace = "target/it/workspace2";
-        final String resumptionToken = "ABC001";
-        //remove all in case there's junk from other tests
-        Utilities.deleteRecursive(Paths.get(workspace, "oai-rec/fake_resume"));
-
-        final Path tokenPath = Paths.get(workspace, "tokens/fake_resume");
-        Files.createDirectories(tokenPath.getParent());
-
         //Pretend there is a resumption token stored
-        final Provider.ResumeDetails details = new Provider.ResumeDetails();
-        details.resumptionToken = resumptionToken;
-        details.prefixes = List.of("oai_dc");
-        details.pIndex = 0;
-        details.sIndex = 0;
-        JAXB.marshal(details, tokenPath.toFile());
+        Path tokenPath = prepareResumeTest(workspace, "fake_resume");
+        Path tokenPath2 = prepareResumeTest(workspace, "fake_resume2");
 
         final String configOnDisk = getConfig("config/test-resume-with-token.xml");
+        // the harvest should start with the resumption token
         Main.main(new String[]{configOnDisk});
         //test this exists and is the only file
-        final Path testRecordPath = Paths.get(workspace, "oai-rec/fake_resume" +
+        Path testRecordPath = Paths.get(workspace, "oai-rec/fake_resume" +
                 "/oai_ufal_point_dev_ufal_hide_ms_mff_cuni_cz_11234_5_XXX_TEST.xml");
         assertTrue(String.format("File '%s' should exist", testRecordPath), Files.exists(testRecordPath));
         assertEquals( 1L, Files.list(testRecordPath.getParent()).count());
         //test cleanup on success
         assertFalse("Token file should be removed on success", Files.exists(tokenPath));
 
+        // verify identifier harvesting
+        testRecordPath = Paths.get(workspace, "oai-rec/fake_resume2" +
+                "/oai_ufal_point_dev_ufal_hide_ms_mff_cuni_cz_11234_5_XXX_TEST.xml");
+        assertTrue(String.format("File '%s' should exist", testRecordPath), Files.exists(testRecordPath));
+        assertEquals( 1L, Files.list(testRecordPath.getParent()).count());
+        assertFalse("Token file should be removed on success", Files.exists(tokenPath2));
+
+    }
+
+    final String resumptionToken = "ABC001";
+    private Path prepareResumeTest(String workspace, String provider) throws IOException {
+        final Path tokenPath = Paths.get(workspace, "tokens", provider);
+        Files.createDirectories(tokenPath.getParent());
+
+        //store the token
+        final Provider.ResumeDetails details = new Provider.ResumeDetails();
+        details.resumptionToken = resumptionToken;
+        details.prefixes = List.of("oai_dc");
+        details.pIndex = 0;
+        details.sIndex = 0;
+        JAXB.marshal(details, tokenPath.toFile());
+        return tokenPath;
     }
 
     private String getConfig(String configResource) throws URISyntaxException {
         final URL resourceURL = getClass().getClassLoader().getResource(configResource);
-        final String configOnDisk = Paths.get(resourceURL.toURI()).toAbsolutePath().toString();
-        return configOnDisk;
+        return Paths.get(resourceURL.toURI()).toAbsolutePath().toString();
+    }
+
+    @After
+    public void cleanup() throws IOException {
+       Utilities.deleteRecursive(Path.of("target/it"));
     }
 }

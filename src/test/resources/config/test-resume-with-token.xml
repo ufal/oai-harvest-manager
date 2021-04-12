@@ -60,5 +60,8 @@
         <provider url="http://localhost:8009/dspace5l/oai/request" name="fake_resume">
             <set>fake_resume</set>
         </provider>
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="fake_resume2" scenario="ListIdentifiers">
+            <set>fake_resume</set>
+        </provider>
     </providers>
 </config>
