@@ -32,6 +32,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -132,6 +133,14 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
             NoSuchFieldException,
             XMLStreamException;
 
+    protected boolean paramCheck(String set){
+        if(set == null){
+            return provider.getSets() == null;
+        }else{
+            return provider.getSets() != null && Arrays.asList(provider.getSets()).contains(set);
+        }
+    }
+
     /**
      * Get the token indicating more data is available. Since a HarvesterVerb 
      * object does not have a method for getting the token itself, the extending
@@ -213,15 +222,15 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
 
 
                         document = verb5(provider.oaiUrl, fromDate, untilDate,
-                                null,
                                 prefixes.get(pIndex),
+                                null,
                                 provider.getTimeout(),
                                 provider.temp);
                     } else {
                         // request targets for a new set and prefix combination
                         document = verb5(provider.oaiUrl, fromDate, untilDate,
-                                provider.sets[sIndex],
                                 prefixes.get(pIndex),
+                                provider.sets[sIndex],
                                 provider.getTimeout(),
                                 provider.temp);
                     }

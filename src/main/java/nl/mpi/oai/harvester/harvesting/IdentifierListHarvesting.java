@@ -34,6 +34,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -101,28 +102,32 @@ public class IdentifierListHarvesting extends ListHarvesting
         return oaiFactory.createListIdentifiers(p1, p2, timeout);
     }
 
+
     /**
-     * <br> Create a request based on the two parameter ListIdentifiers verb <br><br>
-     *
-     * This implementation supplies the form of the verb used in the initial
-     * request. <br><br>
-     *
-     * @param p1 endpoint URL
-     * @param p2 from date, for selective harvesting
-     * @param p3 until date, for selective harvesting
-     * @param p4 metadata prefix
-     * @param p5 set
+     * @param endpoint endpoint URL
+     * @param fromDate from date, for selective harvesting
+     * @param untilDate until date, for selective harvesting
+     * @param metadataPrefix metadata prefix
+     * @param set set
+     * @return the response
+     * @throws IOException IO problem
+     * @throws ParserConfigurationException configuration problem
+     * @throws SAXException XML problem
+     * @throws TransformerException XSL problem
+     * @throws NoSuchFieldException introspection problem
      */
     @Override
-    public DocumentSource verb5(String p1, String p2, String p3, String p4,
-            String p5, int timeout, Path temp) throws
+    public DocumentSource verb5(String endpoint, String fromDate, String untilDate, String metadataPrefix,
+            String set, int timeout, Path temp) throws
             IOException,
             ParserConfigurationException,
             SAXException,
             TransformerException,
             NoSuchFieldException,
             XMLStreamException {
-        return oaiFactory.createListIdentifiers(p1, p2, p3, p4, p5, timeout);
+        assert paramCheck(set)  : String.format("%s is not in %s", set, Arrays.toString(provider.getSets() != null ? provider.getSets() : new String[]{}));
+        // TODO refactor, half of the parameters are fields from instance var provider
+        return oaiFactory.createListIdentifiers(endpoint, fromDate, untilDate, set, metadataPrefix, timeout);
     }
     
     /**

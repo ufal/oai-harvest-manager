@@ -138,20 +138,13 @@ public class RecordListHarvesting extends ListHarvesting
             XMLStreamException {
 
         assert paramCheck(set)  : String.format("%s is not in %s", set, Arrays.toString(provider.getSets() != null ? provider.getSets() : new String[]{}));
-        document = oaiFactory.createListRecords(endpoint, fromDate, untilDate, metadataPrefix, set, timeout, temp);
+        // TODO refactor, half of the parameters are fields from instance var provider
+        document = oaiFactory.createListRecords(endpoint, fromDate, untilDate, set, metadataPrefix, timeout, temp);
 
         // implement by returning ListRecords with the five parameters supplied
         return document;
     }
 
-    private boolean paramCheck(String set){
-        if(set == null){
-            return provider.getSets() == null;
-        }else{
-            return provider.getSets() != null && Arrays.asList(provider.getSets()).contains(set);
-        }
-    }
-    
     /**
      * <br> Get the resumption token associated with a specific response <br><br>
      *
