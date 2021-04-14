@@ -19,7 +19,6 @@
 package nl.mpi.oai.harvester.harvesting;
 
 import nl.mpi.oai.harvester.Provider;
-import nl.mpi.oai.harvester.control.FileSynchronization;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;
@@ -186,12 +185,12 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
 
 
         // TODO XXX implement provider harvesting history
-/*
-        else if(provider.getIncremental() && provider.getLastHarvestedDate() != null) {
+        if(provider.shouldHarvestIncrementally()) {
+            //XXX should go only up until current stats start
             untilDate = formatter.format(new Date());
-            fromDate = formatter.format(provider.getLastHarvestedDate());
+            //XXX verify the format?
+            fromDate = provider.getLastSuccessfulHarvestDate();
         }
-*/
 
         // number of requests attempted
         int i = 0;
@@ -224,8 +223,7 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
 
                 // check if more records would be available
                 resumptionToken = getToken();
-                if( FileSynchronization.getProviderStatistic(provider) !=null)
-                    FileSynchronization.getProviderStatistic(provider).incRequestCount();
+                provider.incRequestCount();
                 // the request completed successfully
                 logSuccessInfo(i);
                 return true;

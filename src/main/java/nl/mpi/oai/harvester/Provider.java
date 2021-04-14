@@ -27,6 +27,7 @@ import nl.mpi.oai.harvester.harvesting.scenarios.Scenario;
 import nl.mpi.oai.harvester.harvesting.scenarios.ScenarioFactory;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.metadata.NSContext;
+import nl.mpi.oai.harvester.utils.Statistic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.oxm.annotations.XmlClassExtractor;
@@ -107,12 +108,15 @@ public class Provider {
 	 */
 	public DeletionMode deletionMode;
 
+	// TODO why are MetadataFactory and OAIFactory created here?
     // factory for metadata records
     final MetadataFactory metadataFactory = new MetadataFactory();
 
     // factory for OAI verbs
     final OAIFactory oaiFactory = new OAIFactory();
     private ResumeDetails resumeDetails;
+    private Statistic currentStatistic;
+    private Statistic historyStatistic;
 
 
     /**
@@ -159,6 +163,8 @@ public class Provider {
         } catch (IOException ex) {
             temp = null;
         }
+
+        currentStatistic = new Statistic();
     }
 
     /**
@@ -168,6 +174,7 @@ public class Provider {
 		if (name == null) fetchName();
 		if(deletionMode == null) fetchDeletionMode();
 		this.resumeDetails = loadResumeDetails();
+		this.historyStatistic = loadHistoryStatistic();
     }
 
     public void close() {
@@ -406,12 +413,12 @@ public class Provider {
                 '}';
     }
 
-    public void persistResumptionDetails(ResumeDetails resumeDetails) {
+    public void persistResumptionDetails(ResumeDetails details) {
         try {
             final Path file = getResumeTokensPath();
             Files.createDirectories(file.getParent());
             StringWriter sw = new StringWriter();
-            JAXB.marshal(resumeDetails, sw);
+            JAXB.marshal(details, sw);
             Files.writeString(file, sw.toString());
         } catch (IOException e) {
             logger.error(e);
@@ -435,8 +442,43 @@ public class Provider {
         return null;
     }
 
+    //TODO cleanup / update
+    private Statistic loadHistoryStatistic() {
+        if(Main.config != null){
+            final Path historyStatisticPath = getHistoryStatisticPath();
+            if(Files.exists(historyStatisticPath)){
+                final StringReader stats;
+                try {
+                    stats = new StringReader(Files.readString(historyStatisticPath));
+                    logger.info("Loaded historical statistics about last harvest from " + historyStatisticPath);
+                    return JAXB.unmarshal(stats, Statistic.class);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
+        }
+        return null;
+    }
+    public void persistCurrentStatistic() {
+        try{
+            final Path file = getHistoryStatisticPath();
+            Files.createDirectories(file.getParent());
+            StringWriter sw = new StringWriter();
+            JAXB.marshal(currentStatistic, sw);
+            Files.writeString(file, sw.toString());
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
+
     private Path getResumeTokensPath(){
         return Paths.get(Main.config.getWorkingDirectory(), "tokens", Util.toFileFormat(this.getName()));
+    }
+
+    private Path getHistoryStatisticPath(){
+        return Paths.get(Main.config.getWorkingDirectory(), "previous_harvest_history_stats",
+                Util.toFileFormat(this.getName()));
     }
 
     public void cleanupResumptionDetails() {
@@ -446,6 +488,28 @@ public class Provider {
         } catch (IOException e) {
             logger.error(e);
         }
+    }
+
+    public void incRequestCount() {
+        currentStatistic.incRequestCount();
+    }
+
+    public boolean shouldHarvestIncrementally() {
+        if(getIncremental() && getLastSuccessfulHarvestDate() != null){
+            if(getDeletionMode() != DeletionMode.PERSISTENT){
+                logger.warn(String.format("The deletion mode is %s; we might not get info about deletes.",
+                        getDeletionMode()));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public String getLastSuccessfulHarvestDate() {
+        if (historyStatistic != null) {
+            return historyStatistic.getDateGathered();
+        }
+        return null;
     }
 
 
