@@ -20,7 +20,6 @@ package nl.mpi.oai.harvester.harvesting;
 
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.control.FileSynchronization;
-import nl.mpi.oai.harvester.control.Main;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;

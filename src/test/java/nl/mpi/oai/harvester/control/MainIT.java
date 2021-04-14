@@ -79,6 +79,8 @@ public class MainIT {
 
     @Test
     public void testIt() throws URISyntaxException {
+        //There are no asserts here; but the whole thing should not throw an exception
+        // Also running a test enables assertions in code (-ea) so in fact this does some testing
         final String configOnDisk = Utilities.getConfig("config/test-config-it.xml");
         Main.main(new String[] {configOnDisk});
     }

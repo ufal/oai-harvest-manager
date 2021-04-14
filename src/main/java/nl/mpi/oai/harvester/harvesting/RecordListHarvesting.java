@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -136,10 +137,19 @@ public class RecordListHarvesting extends ListHarvesting
             NoSuchFieldException,
             XMLStreamException {
 
+        assert paramCheck(set)  : String.format("%s is not in %s", set, Arrays.toString(provider.getSets() != null ? provider.getSets() : new String[]{}));
         document = oaiFactory.createListRecords(endpoint, fromDate, untilDate, metadataPrefix, set, timeout, temp);
 
         // implement by returning ListRecords with the five parameters supplied
         return document;
+    }
+
+    private boolean paramCheck(String set){
+        if(set == null){
+            return provider.getSets() == null;
+        }else{
+            return provider.getSets() != null && Arrays.asList(provider.getSets()).contains(set);
+        }
     }
     
     /**
