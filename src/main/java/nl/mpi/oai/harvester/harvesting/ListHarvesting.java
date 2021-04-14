@@ -187,9 +187,6 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
 
         // TODO XXX implement provider harvesting history
 /*
-        if(provider.shouldResume()){
-            resumptionToken = provider.getResumptionToken();
-        }
         else if(provider.getIncremental() && provider.getLastHarvestedDate() != null) {
             untilDate = formatter.format(new Date());
             fromDate = formatter.format(provider.getLastHarvestedDate());
@@ -199,9 +196,6 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
         // number of requests attempted
         int i = 0;
         for (; ; ) {
-            // assume request will complete successfully
-            boolean done = true;
-
             // try the request
             try {
                 /* Try to get a response from the endpoint. Because of the
@@ -217,29 +211,24 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
                 } else {
                     logger.debug(message[1] + prefixes.get(pIndex));
 
-                    if (provider.sets == null) {
-                        // no sets specified, ask for records by prefix
+                    String set = provider.sets == null ?
+                            null : // no sets specified, ask for records by prefix
+                            provider.getSets()[sIndex]; // request targets for a new set and prefix combination
 
-
-                        document = verb5(provider.oaiUrl, fromDate, untilDate,
-                                prefixes.get(pIndex),
-                                null,
-                                provider.getTimeout(),
-                                provider.temp);
-                    } else {
-                        // request targets for a new set and prefix combination
-                        document = verb5(provider.oaiUrl, fromDate, untilDate,
-                                prefixes.get(pIndex),
-                                provider.sets[sIndex],
-                                provider.getTimeout(),
-                                provider.temp);
-                    }
+                    document = verb5(provider.oaiUrl, fromDate, untilDate,
+                            prefixes.get(pIndex),
+                            set,
+                            provider.getTimeout(),
+                            provider.temp);
                 }
 
                 // check if more records would be available
                 resumptionToken = getToken();
                 if( FileSynchronization.getProviderStatistic(provider) !=null)
                     FileSynchronization.getProviderStatistic(provider).incRequestCount();
+                // the request completed successfully
+                logSuccessInfo(i);
+                return true;
             } catch (IOException
                     | ParserConfigurationException
                     | SAXException
@@ -247,63 +236,67 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
                     | NoSuchFieldException
                     | XMLStreamException e) {
 
-                // invalidate the assumption that everything went fine
-                done = false;
-
                 // report
                 logger.error("ListHarvesting[" + this + "][" + provider + "] request try[" + (i + 1) + "/" + provider.maxRetryCount + "] failed!");
                 logger.error(e.getMessage(), e);
+                retry(++i);
             }
             // tried the request
+        }
+    }
 
-            if (done) {
-                if (provider.sets == null) {
-                    logger.info("retrieved " + prefixes.get(pIndex)
-                            + " records from endpoint " + provider.oaiUrl + (i > 0 ? " after " + (i + 1) + " tries" : ""));
-
-                } else {
-                    logger.info("retrieved " + prefixes.get(pIndex)
-                            + " records in set " + provider.sets[sIndex]
-                            + " from endpoint " + provider.oaiUrl + (i > 0 ? " after " + (i + 1) + " tries" : ""));
-                }
-                // the request completed successfully
-                return true;
-            } else {
-                i++;
-                if (i == provider.maxRetryCount) {
-                    if (provider.sets == null) {
-                        logger.error(message[2] + prefixes.get(pIndex)
-                                + " records from endpoint " + provider.oaiUrl + " after " + i + " tries!");
-
-                    } else {
-                        logger.error(message[2] + prefixes.get(pIndex)
-                                + " records in set " + provider.sets[sIndex]
-                                + " from endpoint " + provider.oaiUrl + " after " + i + " tries!");
-                    }
-                    // We might have harvested only 80k records out of 200k; then some network error caused retries
-                    // and a failure. Don't need to start from scratch if we can keep the resumptionToken
-                    if(resumptionToken != null){
-                        final Provider.ResumeDetails r = new Provider.ResumeDetails();
-                        r.resumptionToken = resumptionToken;
-                        r.pIndex = pIndex;
-                        r.sIndex = sIndex;
-                        r.prefixes = prefixes;
-                        provider.persistResumptionDetails(r);
-                    }
-
-                    // do not retry any more
-                    throw new NoMoreRetriesException(String.format("Failed to harvest %s in %s tries due to errors", provider.oaiUrl, i));
-                }
-                // retry the request once more
-                int retryDelay = provider.getRetryDelay(i-1);
-                if (retryDelay > 0) {
-                    try {
-                        Thread.sleep(retryDelay*1000);
-                    } catch (InterruptedException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
+    private void retry(int i){
+        if (i == provider.maxRetryCount) {
+            logMaxRetryCountReachedError();
+            // We might have harvested only 80k records out of 200k; then some network error caused retries
+            // and a failure. Don't need to start from scratch if we can keep the resumptionToken
+            saveResumeDetails();
+            // do not retry any more
+            throw new NoMoreRetriesException(String.format("Failed to harvest %s in %s tries due to errors", provider.oaiUrl, i));
+        }
+        // retry the request once more
+        int retryDelay = provider.getRetryDelay(i-1);
+        if (retryDelay > 0) {
+            try {
+                Thread.sleep(retryDelay*1000);
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage(), e);
             }
+        }
+    }
+
+    private void logMaxRetryCountReachedError() {
+        if (provider.sets == null) {
+            logger.error(message[2] + prefixes.get(pIndex)
+                    + " records from endpoint " + provider.oaiUrl + " after " + provider.maxRetryCount + " tries!");
+
+        } else {
+            logger.error(message[2] + prefixes.get(pIndex)
+                    + " records in set " + provider.sets[sIndex]
+                    + " from endpoint " + provider.oaiUrl + " after " + provider.maxRetryCount + " tries!");
+        }
+    }
+
+    private void logSuccessInfo(int i){
+        if (provider.sets == null) {
+            logger.info("retrieved " + prefixes.get(pIndex)
+                    + " records from endpoint " + provider.oaiUrl + (i > 0 ? " after " + (i + 1) + " tries" : ""));
+
+        } else {
+            logger.info("retrieved " + prefixes.get(pIndex)
+                    + " records in set " + provider.sets[sIndex]
+                    + " from endpoint " + provider.oaiUrl + (i > 0 ? " after " + (i + 1) + " tries" : ""));
+        }
+    }
+
+    private void saveResumeDetails(){
+        if(resumptionToken != null){
+            final Provider.ResumeDetails r = new Provider.ResumeDetails();
+            r.resumptionToken = resumptionToken;
+            r.pIndex = pIndex;
+            r.sIndex = sIndex;
+            r.prefixes = prefixes;
+            provider.persistResumptionDetails(r);
         }
     }
 
