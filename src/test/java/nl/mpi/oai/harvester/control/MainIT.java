@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import com.github.tomakehurst.wiremock.recording.SnapshotRecordResult;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import nl.mpi.Utilities;
-import nl.mpi.oai.harvester.Provider;
+import nl.mpi.oai.harvester.ResumeDetails;
 import org.junit.*;
 
 import javax.xml.bind.JAXB;
@@ -93,7 +93,7 @@ public class MainIT {
         Main.main(new String[]{configOnDisk});
         //there's 503 simulating an issue
         final StringReader reader = new StringReader(Files.readString(tokenPath));
-        final Provider.ResumeDetails details = JAXB.unmarshal(reader, Provider.ResumeDetails.class);
+        final ResumeDetails details = JAXB.unmarshal(reader, ResumeDetails.class);
         assertEquals( "oai_dc////100", details.resumptionToken);
     }
 
@@ -130,7 +130,7 @@ public class MainIT {
         Files.createDirectories(tokenPath.getParent());
 
         //store the token
-        final Provider.ResumeDetails details = new Provider.ResumeDetails();
+        final ResumeDetails details = new ResumeDetails();
         details.resumptionToken = resumptionToken;
         details.prefixes = List.of("oai_dc");
         details.pIndex = 0;

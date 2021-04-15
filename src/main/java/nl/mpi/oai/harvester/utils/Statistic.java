@@ -1,12 +1,20 @@
 package nl.mpi.oai.harvester.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Basic harvest statistic class
@@ -14,6 +22,7 @@ import java.util.Date;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 public class Statistic {
+    private static final Logger logger = LogManager.getLogger(Statistic.class);
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     private String dateGathered;
@@ -62,5 +71,22 @@ public class Statistic {
     @XmlElement
     public String getDateGathered(){
         return dateGathered;
+    }
+
+    public void persist(Path file){
+        try {
+            Files.createDirectories(file.getParent());
+            JAXB.marshal(this, file.toFile());
+        } catch (IOException e) {
+            logger.error(e);
+        }
+
+    }
+
+    public static Optional<Statistic> load(Path path) {
+        if(Files.exists(path)){
+            return Optional.of(JAXB.unmarshal(path.toFile(), Statistic.class));
+        }
+        return Optional.empty();
     }
 }

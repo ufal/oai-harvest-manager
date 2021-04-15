@@ -35,7 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -46,13 +45,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * This class represents a single OAI-PMH provider.
@@ -413,31 +409,11 @@ public class Provider {
                 '}';
     }
 
-    public void persistResumptionDetails(ResumeDetails details) {
-        try {
-            final Path file = getResumeTokensPath();
-            Files.createDirectories(file.getParent());
-            StringWriter sw = new StringWriter();
-            JAXB.marshal(details, sw);
-            Files.writeString(file, sw.toString());
-        } catch (IOException e) {
-            logger.error(e);
-        }
-    }
-
     private ResumeDetails loadResumeDetails(){
         if(Main.config != null){
-            final Path tokensPath = getResumeTokensPath();
-            if(Files.exists(tokensPath)){
-                final StringReader details;
-                try {
-                    details = new StringReader(Files.readString(tokensPath));
-                    logger.info("Loaded resumption details from " + tokensPath);
-                    return JAXB.unmarshal(details, ResumeDetails.class);
-                } catch (IOException e) {
-                    logger.error(e);
-                }
-            }
+            Path tokensPath = getResumeTokensPath();
+            logger.info("Loading resumption details from " + tokensPath);
+            return ResumeDetails.load(tokensPath).orElse(null);
         }
         return null;
     }
@@ -446,33 +422,17 @@ public class Provider {
     private Statistic loadHistoryStatistic() {
         if(Main.config != null){
             final Path historyStatisticPath = getHistoryStatisticPath();
-            if(Files.exists(historyStatisticPath)){
-                final StringReader stats;
-                try {
-                    stats = new StringReader(Files.readString(historyStatisticPath));
-                    logger.info("Loaded historical statistics about last harvest from " + historyStatisticPath);
-                    return JAXB.unmarshal(stats, Statistic.class);
-                } catch (IOException e) {
-                    logger.error(e);
-                }
-            }
+            logger.info("Loaded historical statistics about last harvest from " + historyStatisticPath);
+            return Statistic.load(historyStatisticPath).orElse(null);
         }
         return null;
     }
     public void persistCurrentStatistic() {
-        try{
-            final Path file = getHistoryStatisticPath();
-            Files.createDirectories(file.getParent());
-            StringWriter sw = new StringWriter();
-            JAXB.marshal(currentStatistic, sw);
-            Files.writeString(file, sw.toString());
-        } catch (IOException e) {
-            logger.error(e);
-        }
+        currentStatistic.persist(getHistoryStatisticPath());
     }
 
 
-    private Path getResumeTokensPath(){
+    public Path getResumeTokensPath(){
         return Paths.get(Main.config.getWorkingDirectory(), "tokens", Util.toFileFormat(this.getName()));
     }
 
@@ -517,12 +477,4 @@ public class Provider {
 		NO, PERSISTENT, TRANSIENT
 	}
 
-	@XmlRootElement
-    public static class ResumeDetails{
-        public String resumptionToken;
-        public int pIndex;
-        public int sIndex;
-        public List<String> prefixes;
-
-    }
 }

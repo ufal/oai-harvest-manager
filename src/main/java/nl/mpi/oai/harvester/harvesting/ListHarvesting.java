@@ -19,6 +19,7 @@
 package nl.mpi.oai.harvester.harvesting;
 
 import nl.mpi.oai.harvester.Provider;
+import nl.mpi.oai.harvester.ResumeDetails;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
 import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;
@@ -289,12 +290,12 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
 
     private void saveResumeDetails(){
         if(resumptionToken != null){
-            final Provider.ResumeDetails r = new Provider.ResumeDetails();
+            final ResumeDetails r = new ResumeDetails();
             r.resumptionToken = resumptionToken;
             r.pIndex = pIndex;
             r.sIndex = sIndex;
             r.prefixes = prefixes;
-            provider.persistResumptionDetails(r);
+            r.persist(provider.getResumeTokensPath());
         }
     }
 

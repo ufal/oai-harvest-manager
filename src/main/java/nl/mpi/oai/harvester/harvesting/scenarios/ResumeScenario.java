@@ -1,6 +1,6 @@
 package nl.mpi.oai.harvester.harvesting.scenarios;
 
-import nl.mpi.oai.harvester.Provider;
+import nl.mpi.oai.harvester.ResumeDetails;
 import nl.mpi.oai.harvester.harvesting.AbstractListHarvesting;
 import nl.mpi.oai.harvester.harvesting.OAIFactory;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
@@ -22,7 +22,7 @@ public class ResumeScenario extends Scenario {
     AbstractListHarvesting createHarvesting(List<String> prefixes, OAIFactory oaiFactory, MetadataFactory metadataFactory) {
         logger.debug("ResumeScenario.createHarvesting3");
         final AbstractListHarvesting harvesting = scenario.createHarvesting(prefixes, oaiFactory, metadataFactory);
-        final Provider.ResumeDetails details = provider.getResumeDetails();
+        final ResumeDetails details = provider.getResumeDetails();
         harvesting.setpIndex(details.pIndex);
         harvesting.setsIndex(details.sIndex);
         harvesting.setPrefixes(details.prefixes);
