@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -83,6 +84,15 @@ public class MainIT {
         // Also running a test enables assertions in code (-ea) so in fact this does some testing
         final String configOnDisk = Utilities.getConfig("config/test-config-it.xml");
         Main.main(new String[] {configOnDisk});
+    }
+    
+    @Test
+    public void listIdentifiersWasMissingARecord() throws URISyntaxException, IOException {
+        final String configOnDisk = Utilities.getConfig("config/only-list-identifiers.xml");
+        Main.main(new String[] {configOnDisk});
+        try(final Stream<Path> stream = Files.list(Path.of("target/it/workspace/oai-rec/lindat_ws2"))){
+            assertEquals("There are five records", 5, stream.count());
+        }
     }
 
     @Test
