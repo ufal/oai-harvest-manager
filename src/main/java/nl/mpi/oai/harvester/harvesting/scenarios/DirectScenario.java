@@ -25,12 +25,6 @@ public class DirectScenario extends Scenario {
      * <br>Get metadata records directly, that is without first obtaining a list
      * of identifiers pointing to them <br><br>
      *
-     * In this scenario, a save action specified before a strip action is
-     * interpreted to apply the the response of the GetRecords verb. Also, the
-     * presence of a strip action in the sequence, is interpreted to apply to
-     * the response also. Since the sequence of actions will be applied to an
-     * individual record, in the sequence both will be disabled.
-     *
      * @param harvesting harvester
      * @return false on parser or input output error
      */
