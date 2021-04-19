@@ -199,21 +199,4 @@ public class RecordListHarvesting extends ListHarvesting
     public Object parseResponse() {
         throw new UnsupportedOperationException("If you see this exception revert the commit that removed the code");
     }
-
-    /**response
-     * <br> Check if the list is fully parsed <br><br>
-     *
-     * This method checks if, as a consequence of repeatedly invoking
-     * processResponse the end of the list nodes created by parseResponse
-     * has been reached.
-     *
-     * Note: since the parsing does not apply to the targets, but to the nodes
-     * in the list, override the AbstractListHarvesting fullyParsed method.
-     *
-     * @return  true if there are more, false otherwise
-     */
-    @Override
-    public boolean fullyParsed() {
-        throw new UnsupportedOperationException("If you see this exception revert the commit that removed the code");
-    }
 }

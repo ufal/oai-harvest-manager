@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
  * @author Kees Jan van de Looij (MPI-PL),
  * @author Lari Lampen (MPI-PL, xpath parsing)
  */
-public final class StaticRecordListHarvesting extends AbstractListHarvesting
+public final class StaticRecordListHarvesting extends RecordListHarvesting
         implements Harvesting{
 
     private static final Logger logger = LogManager.getLogger(
@@ -75,17 +75,10 @@ public final class StaticRecordListHarvesting extends AbstractListHarvesting
                                       List<String> prefixes,
                                       MetadataFactory metadataFactory) {
 
-        super(oaiFactory, provider, metadataFactory);
+        super(oaiFactory, provider, prefixes, metadataFactory);
 
         // get the response stored in the StaticProvider class object
         response = provider.getResponse();
-
-        this.prefixes = prefixes;
-
-        // check the state
-        if ((response == null) || (prefixes.size() == 0)){
-            throw new HarvestingException();
-        }
 
         /* Invariant: the response is in place, and the client at requests at
            least one prefix. Apart from this the provider is a StaticProvider
