@@ -45,12 +45,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a single OAI-PMH provider.
@@ -185,6 +186,63 @@ public class Provider {
 	            logger.error(ex.getMessage());
             }
         }
+	saveRemovedIds(); //so we can remove them from solr
+	purgeFilesBelongingToRemovedIds();
+    }
+
+    private void saveRemovedIds(){
+        if(!deleted.isEmpty()){
+            try {
+                // TODO maybe should be solr xml command, depends how independent this should be; should it know the
+                //  records end up in solr?
+                logger.debug("==== saving removed ids");
+                Path p = getRemovedPath();
+                Files.createDirectories(p.getParent());
+                Files.write(p, deleted);
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }else{
+            logger.debug("==== deleted is empty");
+        }
+    }
+
+    private void purgeFilesBelongingToRemovedIds(){
+        if(deleted.isEmpty()){
+            logger.debug("==== deleted is empty");
+            return;
+        }
+        final String providerDir = Util.toFileFormat(this.getName());
+        final Path wdAbsolute = Path.of(Main.config.getWorkingDirectory()).toAbsolutePath();
+        final Set<String> fileNames = deleted.stream()
+                .map(Util::toFileFormat)
+                .map(s -> s + ".xml")
+                .collect(Collectors.toSet());
+        try {
+            Files.walkFileTree(Path.of(Main.config.getWorkingDirectory()), new SimpleFileVisitor<>() {
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Objects.requireNonNull(file);
+                    Objects.requireNonNull(attrs);
+                    final Path name = file.getFileName();
+                    final Path fileAbsolute = file.toAbsolutePath();
+                    if (name != null &&
+                            fileNames.contains(name.toString()) &&
+                            fileAbsolute.startsWith(wdAbsolute) &&
+                            fileAbsolute.toString().contains(providerDir)
+                    ) {
+                        logger.debug("===== deleting " + fileAbsolute);
+                        Files.deleteIfExists(fileAbsolute);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+            });
+        } catch (IOException e) {
+            logger.error(e);
+        }
+
     }
 
     /**
@@ -435,6 +493,10 @@ public class Provider {
         currentStatistic.persist(getHistoryStatisticPath());
     }
 
+
+    public Path getRemovedPath(){
+        return Paths.get(Main.config.getWorkingDirectory(), "removed", Util.toFileFormat(this.getName()));
+    }
 
     public Path getResumeTokensPath(){
         return Paths.get(Main.config.getWorkingDirectory(), "tokens", Util.toFileFormat(this.getName()));
