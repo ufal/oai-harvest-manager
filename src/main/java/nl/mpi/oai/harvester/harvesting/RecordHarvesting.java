@@ -88,6 +88,7 @@ public final class RecordHarvesting extends AbstractHarvesting {
                 // get metadata record from the endpoint
                 document = oaiFactory.createGetRecord(provider.oaiUrl,
                         identifier, prefix);
+                provider.incRequestCount();
             } catch (IOException
                     | ParserConfigurationException
                     | SAXException

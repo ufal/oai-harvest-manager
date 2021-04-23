@@ -54,11 +54,21 @@ public class Statistic {
     public long getHarvestedRecords() {
         return  records;
     }
+
+    public void setHarvestedRecords(long records){
+        this.records = records;
+    }
+
     @XmlElement
     public long getRequests() {
         return requests;
     }
-    @XmlElement
+
+    public void setRequests(long requests){
+        this.requests = requests;
+    }
+
+    @XmlElement(name="harvestTimeSec")
     public long getHarvestTime() {
         long harvestFinishTime = System.currentTimeMillis();
         return (harvestFinishTime - harvestStartTime)/1000;

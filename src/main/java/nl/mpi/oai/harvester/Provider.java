@@ -441,7 +441,7 @@ public class Provider {
     }
 
     private Path getHistoryStatisticPath(){
-        return Paths.get(Main.config.getWorkingDirectory(), "previous_harvest_history_stats",
+        return Paths.get(Main.config.getWorkingDirectory(), "last_successful_harvest_stats",
                 Util.toFileFormat(this.getName()));
     }
 
@@ -456,6 +456,10 @@ public class Provider {
 
     public void incRequestCount() {
         currentStatistic.incRequestCount();
+    }
+
+    public void incRecordCount() {
+        currentStatistic.incRecordCount();
     }
 
     public boolean shouldHarvestIncrementally() {

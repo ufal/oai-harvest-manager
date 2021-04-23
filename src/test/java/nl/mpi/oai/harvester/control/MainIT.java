@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.recording.SnapshotRecordResult;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import nl.mpi.Utilities;
 import nl.mpi.oai.harvester.ResumeDetails;
+import nl.mpi.oai.harvester.utils.Statistic;
 import org.junit.*;
 
 import javax.xml.bind.JAXB;
@@ -16,7 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -139,6 +143,27 @@ public class MainIT {
         assertEquals( 1L, Files.list(testRecordPath.getParent()).count());
         assertFalse("Token file should be removed on success", Files.exists(tokenPath2));
 
+    }
+
+    @Test
+    public void statsAreSaved() throws URISyntaxException, IOException {
+        final Path statsPath = Paths.get("target/it/workspace2/" + "last_successful_harvest_stats");
+        final String configOnDisk = Utilities.getConfig("config/stats-are-saved.xml");
+        Main.main(new String[]{configOnDisk});
+        final List<Path> files = Files.walk(statsPath)
+                .filter(Files::isRegularFile)
+                .collect(Collectors.toList());
+        assertEquals("There are two providers in the config; there should be two stats files", 2, files.size());
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String expectedDate = format.format(date);
+        final Statistic provider1Stats = Statistic.load(files.get(0)).get();
+        final Statistic provider2Stats = Statistic.load(files.get(1)).get();
+        String actualDate = provider1Stats.getDateGathered();
+        assertEquals("The harvest date should be today", expectedDate, actualDate);
+        //TODO XXX this depends on history being set on ONE save step
+        assertEquals("There are five records", 5, provider1Stats.getHarvestedRecords());
+        assertEquals("There are five records", 5, provider2Stats.getHarvestedRecords());
     }
 
     final String resumptionToken = "ABC001";

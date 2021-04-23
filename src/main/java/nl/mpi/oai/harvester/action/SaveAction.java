@@ -84,7 +84,7 @@ public class SaveAction implements Action {
                 Path path = chooseLocation(record);
                 if(history){
                     FileSynchronization.saveToHistoryFile(record.getOrigin(), path, FileSynchronization.Operation.INSERT);
-                    FileSynchronization.getProviderStatistic(record.getOrigin()).incRecordCount();
+                    record.getOrigin().incRecordCount();
                 }
                 os = Files.newOutputStream(path);
                 if (record.hasDoc()) {
