@@ -61,6 +61,7 @@ public class MainIT {
                 .willReturn(serviceUnavailable())
         );
 
+// These are kept here as a quick reference how to obtain new mappings via proxying
 //        startRecording(
 //            recordSpec()
 //                    .forTarget("http://ufal-point-dev.ufal.hide.ms.mff.cuni.cz/")
@@ -77,6 +78,12 @@ public class MainIT {
 //        final List<StubMapping> stubMappings = snapshotRecordResult.getStubMappings();
 //        System.out.println(stubMappings);
 //    }
+
+    @Before
+    @After
+    public void cleanup() throws IOException {
+        Utilities.deleteRecursive(Path.of("target/it"));
+    }
 
     @Test
     public void testIt() throws URISyntaxException {
@@ -147,10 +154,5 @@ public class MainIT {
         details.sIndex = 0;
         JAXB.marshal(details, tokenPath.toFile());
         return tokenPath;
-    }
-
-    @After
-    public void cleanup() throws IOException {
-       Utilities.deleteRecursive(Path.of("target/it"));
     }
 }
