@@ -29,6 +29,7 @@ public class Statistic {
 
     private long records = 0;
     private long requests = 0;
+    private long deleted = 0;
 
     private long harvestStartTime;
 
@@ -73,6 +74,15 @@ public class Statistic {
         return dateGathered;
     }
 
+    @XmlElement
+    public long getDeleted(){
+        return deleted;
+    }
+
+    public void setDeleted(long deleted){
+        this.deleted = deleted;
+    }
+
     public void persist(Path file){
         try {
             Files.createDirectories(file.getParent());
@@ -88,5 +98,9 @@ public class Statistic {
             return Optional.of(JAXB.unmarshal(path.toFile(), Statistic.class));
         }
         return Optional.empty();
+    }
+
+    public void incDeletedCount() {
+        deleted++;
     }
 }

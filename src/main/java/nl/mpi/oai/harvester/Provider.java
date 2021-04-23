@@ -49,6 +49,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class represents a single OAI-PMH provider.
@@ -113,6 +115,7 @@ public class Provider {
     private ResumeDetails resumeDetails;
     private Statistic currentStatistic;
     private Statistic historyStatistic;
+    private Set<String> deleted;
 
 
     /**
@@ -161,6 +164,7 @@ public class Provider {
         }
 
         currentStatistic = new Statistic();
+        deleted = new HashSet<>();
     }
 
     /**
@@ -470,6 +474,18 @@ public class Provider {
             return historyStatistic.getDateGathered();
         }
         return null;
+    }
+
+    public void addDeleted(String id) {
+        if(deleted.add(id)){
+            currentStatistic.incDeletedCount();
+        }
+
+        // XXX can it verify there's actually something to delete?
+    }
+
+    public int deletedCount() {
+        return deleted.size();
     }
 
     public String getCurrentDate() {

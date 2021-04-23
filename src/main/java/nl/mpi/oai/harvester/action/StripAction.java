@@ -18,7 +18,7 @@
 
 package nl.mpi.oai.harvester.action;
 
-import nl.mpi.oai.harvester.control.Util;
+import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.metadata.Metadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -109,8 +109,25 @@ public class StripAction implements Action {
                                     doc, record.getOrigin(), false, false)
                         );
                     }
-                } else
-                    logger.warn("No content was found in this envelope["+record.getId()+"], it might contain only deleted records");
+                } else {
+                    logger.warn("No content was found in this envelope[" + record.getId() + "], it might contain only deleted records");
+                }
+
+                //process deleted if any, there's no metadata element if deleted
+                try {
+                    NodeList deletedIdentifiers = (NodeList) xpath.evaluate("//*[local-name()='header' and " +
+                                    "@status='deleted' and " +
+                            "parent::*[local-name()='record']]/*[local-name()='identifier']/text()", record.getDoc(),
+                            XPathConstants.NODESET);
+                    if(deletedIdentifiers != null){
+                        for (int i = 0; i < deletedIdentifiers.getLength(); i++) {
+                            String id = deletedIdentifiers.item(i).getNodeValue();
+                            processDeleted(record.getOrigin(), id);
+                        }
+                    }
+                } catch (XPathExpressionException e) {
+                    logger.error(e);
+                }
             } else {
                 XMLEventReader reader = null;
                 XMLEventWriter writer = null;
@@ -176,8 +193,6 @@ public class StripAction implements Action {
                                             if (depth==1) { 
                                                 if (event.asEndElement().getName().getLocalPart().equals("record")) {
                                                     state = State.START;
-                                                    status = null;
-                                                    id = null;
                                                 } else {
                                                     logger.error("record XML element out of sync! Expected record got ["+event.asEndElement().getName()+"]");
                                                     state = State.ERROR;
@@ -202,6 +217,9 @@ public class StripAction implements Action {
                                             if (depth==2) { 
                                                 if (event.asEndElement().getName().getLocalPart().equals("header")) {
                                                     state = State.RECORD;
+                                                    if("deleted".equals(status)){
+                                                        processDeleted(record.getOrigin(), id);
+                                                    }
                                                 } else {
                                                     logger.error("header XML element out of sync! Expected header got ["+event.asEndElement().getName()+"]");
                                                     state = State.ERROR;
@@ -248,17 +266,13 @@ public class StripAction implements Action {
                                         writer.add(event);
                                     } else {
                                         writer.close();
-                                        if (status == null || !status.equals("deleted")) {
-                                            logger.debug("stripped XML stream["+i+"]["+id+"] to ["+baos.size()+"] bytes");
-                                            newRecords.add(new Metadata(
-                                                id, record.getPrefix(),
-                                                new ByteArrayInputStream(baos.toByteArray()),
-                                                record.getOrigin(),
-                                                false, false)
-                                            );
-                                        }else {
-                                            System.out.println(Util.toFileFormat(id) + ".xml");
-                                        }
+                                        logger.debug("stripped XML stream["+i+"]["+id+"] to ["+baos.size()+"] bytes");
+                                        newRecords.add(new Metadata(
+                                            id, record.getPrefix(),
+                                            new ByteArrayInputStream(baos.toByteArray()),
+                                            record.getOrigin(),
+                                            false, false)
+                                        );
                                         writer = null;
                                         baos = null;
                                     }
@@ -293,6 +307,11 @@ public class StripAction implements Action {
         }
         records.addAll(newRecords);
         return true;
+    }
+
+    private void processDeleted(Provider provider, String id) {
+        logger.debug(String.format("record with id \"%s\" marked deleted", id));
+        provider.addDeleted(id);
     }
 
     @Override
