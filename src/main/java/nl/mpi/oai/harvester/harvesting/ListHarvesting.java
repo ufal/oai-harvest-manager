@@ -185,11 +185,12 @@ public abstract class ListHarvesting extends AbstractListHarvesting implements
         String untilDate = null;
 
 
-        // TODO XXX implement provider harvesting history
         if(provider.shouldHarvestIncrementally()) {
-            //XXX should go only up until current stats start
-            untilDate = formatter.format(new Date());
-            //XXX verify the format?
+            // According to spec the dates are inclusive <from, until>
+            // Take only the data that existed on the day we started the harvest.
+            // The guaranteed granularity is day; these introduce an overlap
+            untilDate = provider.getCurrentDate();
+            // TODO verify the format? what if repository supports seconds granularity
             fromDate = provider.getLastSuccessfulHarvestDate();
         }
 

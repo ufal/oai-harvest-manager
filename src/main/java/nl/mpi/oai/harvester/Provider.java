@@ -472,6 +472,10 @@ public class Provider {
         return null;
     }
 
+    public String getCurrentDate() {
+        return currentStatistic.getDateGathered();
+    }
+
 
     public enum DeletionMode {
 		NO, PERSISTENT, TRANSIENT
