@@ -75,6 +75,7 @@ public class Metadata {
         this.prefix       = prefix;
         this.docSrc       = docSrc;
         this.origin       = endpoint;
+        //TODO isEnvelope, isList are never used remove
     }
 
     /**

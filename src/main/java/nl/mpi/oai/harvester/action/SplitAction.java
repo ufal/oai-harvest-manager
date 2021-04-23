@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+//TODO XXX why do we need this action?
 /**
  * This action corresponds to splitting the OAI-PMH envelope with multiple records
  * into multiple ones with each one harvested metadata record.

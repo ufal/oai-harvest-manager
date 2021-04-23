@@ -14,6 +14,8 @@ public class StaticScenario extends Scenario {
     private static final Logger logger = LogManager.getLogger(StaticScenario.class);
     private final Scenario scenario;
 
+    // TODO XXX why was (still is) there a need for static harvest with listRecords and listIdentifiers, see
+    // git show 957a008:src/main/java/nl/mpi/oai/harvester/control/Worker.java | sed -ne '130,180p'
     StaticScenario(Scenario scenario){
         super(scenario.provider, scenario.actionSequence);
         this.scenario = scenario;
