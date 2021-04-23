@@ -32,6 +32,11 @@ public class StaticParamTransformAction extends TransformAction {
 
     @Override
     public boolean perform(List<Metadata> records){
+        if(records.isEmpty()){
+            logger.warn("There are no records to process");
+            return true;
+        }
+
         final String pName = records.get(0).getOrigin().getName();
         if(!pName.equals(currName)){
             currName = pName;
