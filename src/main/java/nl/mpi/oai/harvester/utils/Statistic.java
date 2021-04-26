@@ -42,8 +42,8 @@ public class Statistic {
         dateGathered = formatter.format(date);
     }
 
-    public void incRecordCount(){
-        records++;
+    public void incRecordCount(int increment){
+        records += increment;
     }
 
     public void incRequestCount(){

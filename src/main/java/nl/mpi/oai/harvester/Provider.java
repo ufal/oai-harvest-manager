@@ -520,8 +520,8 @@ public class Provider {
         currentStatistic.incRequestCount();
     }
 
-    public void incRecordCount() {
-        currentStatistic.incRecordCount();
+    public void incRecordCount(int increment) {
+        currentStatistic.incRecordCount(increment);
     }
 
     public boolean shouldHarvestIncrementally() {

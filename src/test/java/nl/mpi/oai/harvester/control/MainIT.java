@@ -161,7 +161,6 @@ public class MainIT {
         final Statistic provider2Stats = Statistic.load(files.get(1)).get();
         String actualDate = provider1Stats.getDateGathered();
         assertEquals("The harvest date should be today", expectedDate, actualDate);
-        //TODO XXX this depends on history being set on ONE save step
         assertEquals("There are five records", 5, provider1Stats.getHarvestedRecords());
         assertEquals("There are five records", 5, provider2Stats.getHarvestedRecords());
     }

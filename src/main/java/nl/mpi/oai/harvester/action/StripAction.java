@@ -305,6 +305,11 @@ public class StripAction implements Action {
 
             }
         }
+        if(!newRecords.isEmpty()){
+            //assumes there's only records from one provider in the list
+            final Provider provider = newRecords.get(0).getOrigin();
+            provider.incRecordCount(newRecords.size());
+        }
         records.addAll(newRecords);
         return true;
     }
