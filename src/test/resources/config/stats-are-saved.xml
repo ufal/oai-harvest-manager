@@ -1,0 +1,67 @@
+<!-- This is the configuration for CLARIN harvesting. -->
+<config>
+
+    <!-- ### configuration settings ### -->
+    <settings>
+        <!-- Working directory. -->
+        <workdir>target/it/workspace2</workdir>
+
+        <!-- Maximum number of attempts per record before giving up. -->
+        <max-retry-count>2</max-retry-count>
+
+        <!-- Delay between retries of a record (seconds). -->
+        <retry-delay>10</retry-delay>
+
+        <!-- Maximum number of concurrent harvester(worker) threads -->
+        <max-jobs>6</max-jobs>
+
+        <!-- Number of resources placed in the resource pool. -->
+        <resource-pool-size>6</resource-pool-size>
+
+        <!-- Default timeout (for connection and reading) for a single
+        http request in seconds. If unspecified, will be INFINITE.  -->
+        <timeout>60</timeout>
+        <scenario>ListRecords</scenario>
+        <incremental>false</incremental>
+        <dry-run>false</dry-run>
+    </settings>
+
+    <!-- ### output directories (referenced in the action section) ### -->
+    <directories>
+        <!-- When the attribute 'max-files' is non-zero, subdirectories
+             will be created to ensure no directory has more than that
+             number of files. -->
+        <dir path="oai-rec" id="rec" max-files="0"/>
+        <dir path="oai-pmh" id="oai" max-files="0"/>
+        <dir path="results/cmdi-1_1" id="cmdi-1_1" max-files="0"/>
+        <dir path="results/cmdi" id="cmdi-1_2" max-files="0"/>
+        <dir path="results/identity" id="ident" max-files="0"/>
+        <dir path="results/identity2" id="ident2" max-files="1"/>
+    </directories>
+
+
+    <!-- ### actions to take on metadata formats (in order of preference) ### -->
+    <actions>
+        <format match="prefix" value="oai_dc">
+            <action type="split"/>
+            <action type="save" dir="rec" suffix=".xml" history="true"/>
+            <action type="strip"/>
+            <action type="save" dir="oai" suffix=".xml" offload="true"/>
+            <action type="staticTransform" file="http://localhost:8009/xslts/identity.xsl" max-jobs="6"/>
+            <action type="save" dir="ident" suffix=".xml"/>
+            <!-- max-jobs="1" to try forcing wait in resource pool -->
+            <action type="transform" file="http://localhost:8009/xslts/identity2.xsl" max-jobs="1"/>
+            <action type="save" dir="ident2" suffix=".xml"/>
+        </format>
+    </actions>
+
+    <!-- ### list of providers ### -->
+    <providers>
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="provider1">
+            <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
+        </provider>
+        <provider url="http://localhost:8009/dspace5l/oai/request" name="provider2" scenario="ListIdentifiers">
+            <set>hdl_11858_00-097C-0000-0023-8C33-2</set>
+        </provider>
+    </providers>
+</config>
