@@ -33,6 +33,7 @@
         <!-- When the attribute 'max-files' is non-zero, subdirectories
              will be created to ensure no directory has more than that
              number of files. -->
+        <dir path="raw" id="raw" max-files="0"/>
         <dir path="oai-rec" id="rec" max-files="0"/>
         <dir path="oai-pmh" id="oai" max-files="0"/>
         <dir path="results/cmdi-1_1" id="cmdi-1_1" max-files="0"/>
@@ -45,8 +46,7 @@
     <!-- ### actions to take on metadata formats (in order of preference) ### -->
     <actions>
         <format match="prefix" value="oai_dc">
-            <action type="split"/>
-            <action type="save" dir="rec" suffix=".xml" history="true"/>
+            <action type="save" dir="raw" suffix=".xml"/>
             <action type="strip"/>
             <action type="save" dir="oai" suffix=".xml" offload="true"/>
             <action type="staticTransform" file="http://localhost:8009/xslts/identity.xsl" max-jobs="6"/>
@@ -57,8 +57,6 @@
         </format>
         <!-- for static-repo.xml -->
         <format match="prefix" value="olac">
-            <action type="split"/>
-            <action type="save" dir="rec" suffix=".xml" history="true"/>
             <action type="strip"/>
             <action type="save" dir="oai" suffix=".xml"/>
             <action type="transform" file="http://localhost:8009/xslts/identity.xsl"/>
