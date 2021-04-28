@@ -18,8 +18,7 @@
 
 package nl.mpi.oai.harvester.action;
 
-import nl.mpi.oai.harvester.control.FileSynchronization;
-import nl.mpi.oai.harvester.control.Util;
+import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.metadata.Metadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -115,8 +114,7 @@ public class SplitAction implements Action {
                                         doc, record.getOrigin(), false, false));
 
                             } else {
-                                logger.warn("record[" + id + "] is marked as deleted");
-                                FileSynchronization.saveFilesToRemove(Util.toFileFormat(id) + ".xml", record.getOrigin());
+                                processDeleted(record.getOrigin(), id);
                             }
                         } catch (XPathExpressionException ex) {
                             logger.error(ex);
@@ -209,7 +207,7 @@ public class SplitAction implements Action {
                                             );
                                         }
                                         if("deleted".equals(status)){
-                                            FileSynchronization.saveFilesToRemove(Util.toFileFormat(id) + ".xml", record.getOrigin());
+                                            processDeleted(record.getOrigin(), id);
                                         }
 
                                         writer = null;
@@ -287,6 +285,11 @@ public class SplitAction implements Action {
         }
         records.addAll(newRecords);
         return true;
+    }
+
+    private void processDeleted(Provider provider, String id) {
+        logger.warn("record[" + id + "] is marked as deleted");
+        provider.addDeleted(id);
     }
 
     @Override

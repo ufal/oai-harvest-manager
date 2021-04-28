@@ -26,7 +26,6 @@ import nl.mpi.oai.harvester.utils.MarkableFileInputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.codehaus.stax2.XMLInputFactory2;
-import org.w3c.dom.Document;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;

@@ -82,7 +82,6 @@ class Worker implements Runnable {
             boolean done = false;
 
             logger.info("Processing provider[" + provider + "]");
-            FileSynchronization.addProviderStatistic(provider);
 
             for (final ActionSequence actionSequence : actionSequences) {
                 

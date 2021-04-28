@@ -20,7 +20,6 @@ package nl.mpi.oai.harvester.harvesting.scenarios;
 
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.action.ActionSequence;
-import nl.mpi.oai.harvester.control.FileSynchronization;
 import nl.mpi.oai.harvester.harvesting.AbstractListHarvesting;
 import nl.mpi.oai.harvester.harvesting.FormatHarvesting;
 import nl.mpi.oai.harvester.harvesting.OAIFactory;
@@ -128,7 +127,11 @@ public abstract class Scenario {
         boolean done = doGetRecords(harvesting);
 
         if(provider.getIncremental()) {
-            FileSynchronization.execute(provider);
+            logger.warn("Synchronization of deleted records will currently only work with providers having PERSISTENT" +
+                    " deletion mode.");
+            // TODO synchronization should be run only if shouldHarvestIncrementally
+            // we should keep the prefixes & sets, as ListIdentifiers is prefix dependent
+            //FileSynchronization.execute(provider);
         }
         return done;
 
