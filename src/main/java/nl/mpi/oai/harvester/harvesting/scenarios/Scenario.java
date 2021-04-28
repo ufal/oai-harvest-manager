@@ -115,6 +115,8 @@ public abstract class Scenario {
     }
 
     public final boolean getRecords(OAIFactory oaiFactory, MetadataFactory metadataFactory){
+        //TODO refactor we are fetching prefixes for each action sequence
+
         // list of prefixes provided by the endpoint
         List<String> prefixes = getMetadataFormats(oaiFactory);
         if (prefixes.isEmpty()) {

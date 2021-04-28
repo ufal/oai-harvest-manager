@@ -43,10 +43,12 @@ public class DirectScenario extends Scenario {
                     exclusiveLock.readLock().lock();
                 }
 
+                //TODO cleanup - this should be true or it throws; at least with ListHarvesting
                 if (!harvesting.request()) {
                     return false;
                 } else {
                     records = harvesting.getResponse();
+                    //TODO cleanup - records can't be null the above throws if it is; at least with ListHarvesting
                     if (records == null) {
                         return false;
                     } else {
