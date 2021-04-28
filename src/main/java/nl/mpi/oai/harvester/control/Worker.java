@@ -93,11 +93,12 @@ class Worker implements Runnable {
                 // break after any (the first) action sequence has completed successfully
                 if (done){
                     provider.cleanupResumptionDetails();
+                    // XXX only persist on success
+                    provider.persistCurrentStatistic();
                     break;
                 }
             }
 
-            provider.persistCurrentStatistic();
         } catch (Throwable e) {
             logger.error("Processing failed for " + provider+": "+e.getMessage(),e);
             t = e;
