@@ -12,10 +12,13 @@ import nl.mpi.oai.harvester.utils.DocumentSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class DirectScenario extends Scenario {
     private static final Logger logger = LogManager.getLogger(DirectScenario.class);
+    private static final SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
     DirectScenario(Provider provider, ActionSequence actionSequence) {
         super(provider, actionSequence);
@@ -31,8 +34,6 @@ public class DirectScenario extends Scenario {
     private boolean listRecords(AbstractListHarvesting harvesting) {
 
         DocumentSource records;
-
-        Integer n = 0;
 
         do {
             try {
@@ -52,15 +53,12 @@ public class DirectScenario extends Scenario {
                     if (records == null) {
                         return false;
                     } else {
-                        String id;
-                        id = String.format("%07d", n);
+                        String timestamp = TIMESTAMP.format(new Date());
 
                         Metadata metadata = harvesting.getMetadataFactory().create(
-                                provider.getName() + "-" + id,
+                                provider.getName() + "-" + timestamp,
                                 OAIHelper.getPrefix(records),
                                 records, this.provider, true, true);
-
-                        n++;
 
                         // apply the action sequence to the records
                         actionSequence.runActions(metadata);
