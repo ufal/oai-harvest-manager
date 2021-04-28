@@ -47,10 +47,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -484,8 +481,11 @@ public class Provider {
     private Statistic loadHistoryStatistic() {
         if(Main.config != null){
             final Path historyStatisticPath = getHistoryStatisticPath();
-            logger.info("Loaded historical statistics about last harvest from " + historyStatisticPath);
-            return Statistic.load(historyStatisticPath).orElse(null);
+            final Optional<Statistic> statistic = Statistic.load(historyStatisticPath);
+            if(statistic.isPresent()){
+                logger.info("Loaded historical statistics about last harvest from " + historyStatisticPath);
+                return statistic.get();
+            }
         }
         return null;
     }
