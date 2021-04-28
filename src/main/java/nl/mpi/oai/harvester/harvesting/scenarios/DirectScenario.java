@@ -18,7 +18,7 @@ import java.util.List;
 
 public class DirectScenario extends Scenario {
     private static final Logger logger = LogManager.getLogger(DirectScenario.class);
-    private static final SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    private IdGenerator idGenerator = new TimestampIdGenerator();
 
     DirectScenario(Provider provider, ActionSequence actionSequence) {
         super(provider, actionSequence);
@@ -53,10 +53,10 @@ public class DirectScenario extends Scenario {
                     if (records == null) {
                         return false;
                     } else {
-                        String timestamp = TIMESTAMP.format(new Date());
+                        String idSuffix = idGenerator.nextId();
 
                         Metadata metadata = harvesting.getMetadataFactory().create(
-                                provider.getName() + "-" + timestamp,
+                                provider.getName() + "-" + idSuffix,
                                 OAIHelper.getPrefix(records),
                                 records, this.provider, true, true);
 
@@ -98,5 +98,29 @@ public class DirectScenario extends Scenario {
         boolean done = listRecords(harvesting);
         logger.debug("list records -> done[" + done + "]");
         return done;
+    }
+
+    // TODO fix the tests properly; this is a convenience method to bring back the old id's the ScenarioTest needs
+    public void switchToNumberIdGenerator(){
+        idGenerator = new NumberIdGenerator();
+    }
+
+    interface IdGenerator {
+        String nextId();
+    }
+    private static class NumberIdGenerator implements IdGenerator {
+        private int n = 0;
+        @Override
+        public String nextId() {
+            return String.format("%07d", n++);
+        }
+    }
+    private static class TimestampIdGenerator implements IdGenerator{
+        private static final SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+
+        @Override
+        public String nextId() {
+            return TIMESTAMP.format(new Date());
+        }
     }
 }

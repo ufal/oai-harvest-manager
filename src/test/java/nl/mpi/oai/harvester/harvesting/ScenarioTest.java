@@ -21,6 +21,7 @@ package nl.mpi.oai.harvester.harvesting;
 
 import nl.mpi.oai.harvester.Provider;
 import nl.mpi.oai.harvester.action.ActionSequence;
+import nl.mpi.oai.harvester.harvesting.scenarios.DirectScenario;
 import nl.mpi.oai.harvester.harvesting.scenarios.Scenario;
 import nl.mpi.oai.harvester.harvesting.scenarios.ScenarioFactory;
 import nl.mpi.oai.harvester.metadata.MetadataFactory;
@@ -150,6 +151,7 @@ public class ScenarioTest {
                 endpoint.setScenario("ListRecords");
                 // create a scenario with the endpoint and the mocked sequence
                 Scenario scenario = ScenarioFactory.getScenario(endpoint, sequence);
+                ((DirectScenario)scenario).switchToNumberIdGenerator();
                 // follow the record list harvesting scenario
                 scenario.getRecords(oaiFactory, metadataFactory);
 
